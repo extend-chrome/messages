@@ -1,0 +1,44 @@
+{
+  "name": "@bumble/message",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chrome extension messages.",
+  "license": "MIT",
+  "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
+  "files": [
+    "build"
+  ],
+  "main": "build/bundle-cjs.js",
+  "module": "build/bundle-esm.js",
+  "scripts": {
+    "build": "rollup -c",
+    "start": "rollup -c -w",
+    "test": "jest",
+    "preversion": "npm run build",
+    "postversion": "git push && npm publish"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./tests/jest.setup.js"
+    ],
+    "transform": {
+      ".(js|jsx|ts|tsx)": "@sucrase/jest-plugin"
+    }
+  },
+  "dependencies": {
+    "@bumble/chrome-rxjs": "^0.1.0",
+    "@bumble/rxjs-log": "^0.1.0",
+    "chrome-promise": "^3.0.4",
+    "rxjs": "^6.4.0"
+  },
+  "devDependencies": {
+    "@sucrase/jest-plugin": "^2.0.0",
+    "@types/chrome": "0.0.81",
+    "eslint": "5.15.1",
+    "jest": "^24.5.0",
+    "rollup": "^1.7.4",
+    "rollup-plugin-code-string": "^0.1.1",
+    "sinon-chrome": "^2.3.2",
+    "sucrase": "^3.10.1"
+  }
+}
