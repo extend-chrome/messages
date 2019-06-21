@@ -1,6 +1,3 @@
-// @ts-ignore
-import { runtime } from '@bumble/chrome-rxjs'
-
 import { getFrameName } from './frames'
 import { MessagesError } from './port-error'
 
@@ -248,10 +245,12 @@ export const onMessage = (
     sender: chrome.runtime.MessageSender,
     sendResponse: (response: Bumble.Messages.Response) => void,
   ): boolean {
-    let result: any
+    if (message.target !== frameName) {
+      return false
+    }
 
     try {
-      result = callback(message, sender)
+      const result = callback(message, sender)
 
       if (!async) {
         // If the message is not async, close the port
