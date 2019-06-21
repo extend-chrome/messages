@@ -6,7 +6,11 @@ const pathname = location.pathname.slice(1)
 export const isExtensionFrame = (): boolean =>
   location.protocol === 'chrome-extension:'
 
-export const isContentScript = (): boolean => !isExtensionFrame()
+export const isContentScript = (): boolean =>
+  !isExtensionFrame() &&
+  chrome &&
+  chrome.runtime &&
+  !chrome.runtime.getBackgroundPage
 
 export const isBackgroundPage = (): boolean =>
   isExtensionFrame() &&
@@ -28,7 +32,11 @@ export const getFrameName = (): string => {
       return 'background'
     case isOptionsPage():
       return 'options'
-    default:
+    case isPopupPage():
       return 'popup'
+    default: {
+      console.warn('Unable to derive frame name.')
+      return ''
+    }
   }
 }
