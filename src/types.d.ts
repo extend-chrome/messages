@@ -31,7 +31,9 @@ declare namespace Bumble.Messages {
   }
 
   interface Send {
-    (message: Message): Promise<Response | undefined>
+    (message: Message, _retries?: number): Promise<
+      Response | undefined
+    >
   }
 
   interface OnMessageCallback {

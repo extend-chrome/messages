@@ -1,18 +1,19 @@
 import { getFrameName } from './frames'
 import { MessagesError } from './port-error'
 
-const frameName = getFrameName()
+const _frameName = getFrameName()
 const ports: Bumble.Messages.Ports = {}
 
+// FIXME: error if send is called before ports can finish registering
+// messages sent on first tick must be queued until registration finishes
 const connect = (): void => {
-  ports.self = chrome.runtime.connect({ name: frameName })
+  const port = chrome.runtime.connect({ name: _frameName })
 
-  ports.self.onDisconnect.addListener(() => {
+  port.onDisconnect.addListener(() => {
     if (chrome.runtime.lastError) {
       // Do nothing, nobody is listening
+      console.log(chrome.runtime.lastError.message)
     }
-
-    delete ports.self
   })
 }
 
@@ -21,30 +22,41 @@ const connect = (): void => {
 /* -------------------------------------------- */
 
 chrome.runtime.onConnect.addListener((port) => {
+  let name: string | number
+
   if (
     port.name === 'content' &&
     port.sender &&
     port.sender.tab &&
     port.sender.tab.id
   ) {
-    ports[port.sender.tab.id] = port
+    name = port.sender.tab.id
   } else if (port.name) {
-    ports[port.name] = port
+    name = port.name
+  } else {
+    throw new TypeError('Unable to derive port name')
   }
 
-  port.onDisconnect.addListener((port) => {
-    if (chrome.runtime.lastError) {
-      console.error(chrome.runtime.lastError)
-    }
+  if (!ports[name]) {
+    ports[name] = port
 
-    delete ports[port.name]
-  })
+    port.onDisconnect.addListener((port) => {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError)
+      }
 
-  // TODO: handle port reconnects
-  connect()
+      console.log('disconnected from', name)
+
+      delete ports[name]
+    })
+
+    connect()
+
+    console.log('connected to', name)
+  }
 })
 
-// TODO: handle port reconnects
+// Discover other pages
 connect()
 
 /**
@@ -103,20 +115,35 @@ export const send: Bumble.Messages.Send = (message) => {
  *     console.log('They said', response.greeting)
  *   })
  */
-export const sendToFrame: Bumble.Messages.Send = (message) => {
+export const sendToFrame: Bumble.Messages.Send = (
+  message,
+  _retries = 0,
+) => {
   if (typeof message.target !== 'string') {
     throw new TypeError('message.target must be of type string')
   }
 
   if (!ports[message.target]) {
-    return Promise.reject(
-      new MessagesError(
-        `The ${
-          message.target
-        } page is not registered, could not connect to port.`,
-        ports,
-      ),
-    )
+    if (_retries < 5) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          try {
+            resolve(sendToFrame(message, _retries + 1))
+          } catch (error) {
+            reject(error)
+          }
+        }, 100)
+      })
+    } else {
+      return Promise.reject(
+        new MessagesError(
+          `The ${
+            message.target
+          } page is not registered, could not connect to port.`,
+          ports,
+        ),
+      )
+    }
   }
 
   if (!message.async) {
@@ -162,23 +189,35 @@ export const sendToFrame: Bumble.Messages.Send = (message) => {
  *   console.log('They said', response.greeting)
  * })
  */
-export const sendToTab: Bumble.Messages.Send = ({
-  target,
-  ...message
-}) => {
-  if (typeof target !== 'number') {
+export const sendToTab: Bumble.Messages.Send = (
+  message,
+  _retries = 0,
+) => {
+  if (typeof message.target !== 'number') {
     throw new TypeError('message.target must be of type number')
   }
 
-  if (!ports[target]) {
-    return Promise.reject(
-      new MessagesError(
-        `Tab #${
-          message.target
-        } is not registered, could not connect to port.`,
-        ports,
-      ),
-    )
+  if (!ports[message.target]) {
+    if (_retries < 5) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          try {
+            resolve(sendToTab(message, _retries + 1))
+          } catch (error) {
+            reject(error)
+          }
+        }, 100)
+      })
+    } else {
+      return Promise.reject(
+        new MessagesError(
+          `The ${
+            message.target
+          } page is not registered, could not connect to port.`,
+          ports,
+        ),
+      )
+    }
   }
 
   if (!message.async) {
@@ -189,15 +228,20 @@ export const sendToTab: Bumble.Messages.Send = ({
 
   return new Promise((resolve, reject) => {
     try {
-      chrome.tabs.sendMessage(target, message, (response) => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError.message)
-        } else if (!response.success) {
-          reject(response)
-        } else {
-          resolve(response)
-        }
-      })
+      chrome.tabs.sendMessage(
+        // @ts-ignore
+        message.target,
+        message,
+        (response: Bumble.Messages.Response) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError.message)
+          } else if (!response.success) {
+            reject(response)
+          } else {
+            resolve(response)
+          }
+        },
+      )
     } catch (error) {
       reject(error)
     }
@@ -234,7 +278,7 @@ export const sendToTab: Bumble.Messages.Send = ({
  */
 export const onMessage = (
   callback: Bumble.Messages.OnMessageCallback,
-  frameName?: string,
+  frameName: string = _frameName,
 ): Bumble.Messages.OnMessageUnsubscribe => {
   chrome.runtime.onMessage.addListener(listener)
 
