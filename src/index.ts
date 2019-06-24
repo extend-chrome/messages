@@ -1,3 +1,2 @@
-import * as _messages from './messages'
-
-export const messages = _messages
+export { off, onlyOff, on, onlyOn } from './events'
+export { send, onlySend } from './send'

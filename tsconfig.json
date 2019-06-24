@@ -9,5 +9,6 @@
     "target": "es2017"
   },
   "compileOnSave": true,
-  "include": ["src", "types"]
+  "include": ["src/**/*", "types/**/*"],
+  "typeRoots": ["node_modules/@types", "node_modules/rxjs"]
 }
