@@ -7,9 +7,6 @@ export const createEvent = (
     addListener(cb: Function) {
       _cbs.add(cb)
     },
-    removeListener(cb: Function) {
-      _cbs.delete(cb)
-    },
     hasListener(cb: Function) {
       return _cbs.has(cb)
     },
@@ -20,6 +17,9 @@ export const createEvent = (
       _cbs.forEach((l) => {
         l(...nextSelector(...args))
       })
+    },
+    removeListener(cb: Function) {
+      _cbs.delete(cb)
     },
   }
 }
