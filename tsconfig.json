@@ -9,7 +9,7 @@
     "target": "es2017"
   },
   "compileOnSave": true,
-  "include": ["src/**/*", "types/**/*"],
+  "include": ["**/*.ts"],
   "typeRoots": [
     "types",
     "node_modules/@types",
