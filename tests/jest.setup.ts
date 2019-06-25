@@ -1,27 +1,5 @@
 import * as chrome from 'sinon-chrome'
-
-/*
-  Mock-implementation of chrome.runtime messaging API
-*/
-const Port = () => {
-  const _listeners = []
-
-  return {
-    onMessage: {
-      addListener: (cb) => _listeners.push(cb),
-    },
-
-    onDisconnect: {
-      addListener: (cb) => {},
-    },
-
-    postMessage: (data) => {
-      _listeners.forEach((cb) => cb.call(this, data))
-    },
-  }
-}
-
-chrome.runtime.connect.returns(Port())
+import { Port, Tab } from './port.setup'
 
 chrome.runtime.id = 'foo123' // Fix for schema.json
 
@@ -37,6 +15,6 @@ var ChromePromise = require('chrome-promise/constructor')
 
 var chromep = new ChromePromise({ chrome })
 
-export { chrome, chromep }
+export { chrome, chromep, Port, Tab }
 ;(<any>window).chrome = chrome
 ;(<any>window).chromep = chromep
