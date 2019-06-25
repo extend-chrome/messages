@@ -10,5 +10,9 @@
   },
   "compileOnSave": true,
   "include": ["src/**/*", "types/**/*"],
-  "typeRoots": ["node_modules/@types", "node_modules/rxjs"]
+  "typeRoots": [
+    "types",
+    "node_modules/@types",
+    "node_modules/rxjs"
+  ]
 }
