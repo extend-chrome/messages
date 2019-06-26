@@ -15,6 +15,13 @@ var ChromePromise = require('chrome-promise/constructor')
 
 var chromep = new ChromePromise({ chrome })
 
+var nodeCrypto = require('crypto')
+;(<any>window).crypto = {
+  getRandomValues: function(buffer: Uint8Array) {
+    return nodeCrypto.randomFillSync(buffer)
+  },
+}
+
 export { chrome, chromep, Port, Tab }
 ;(<any>window).chrome = chrome
 ;(<any>window).chromep = chromep

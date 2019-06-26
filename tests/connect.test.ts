@@ -1,14 +1,12 @@
-import assert from 'power-assert'
-import { chrome, chromep, Port, Tab } from './jest.setup'
-
+import * as assert from 'power-assert'
 import {
   connect,
+  connectAs,
   handleConnect,
   handleDisconnect,
-  connectAs,
 } from '../src/connect'
 import { ports } from '../src/ports'
-import { frameName } from '../src/frames'
+import { chrome, Port, Tab } from './jest.setup'
 
 jest.mock('../src/connect')
 jest.mock('../src/frames')
@@ -33,7 +31,7 @@ describe('connect', () => {
   })
 
   test('calls chrome.runtime.connect', () => {
-    const port = connect('test')
+    connect('test')
 
     assert(chrome.runtime.connect.called)
   })
@@ -67,11 +65,14 @@ describe('handleConnect', () => {
   })
 
   test('throws if tab.id and port.name are undefined', () => {
-    const throws = (portName) => {
-      handleConnect(Port(portName))
+    const throws = () => {
+      // @ts-ignore
+      handleConnect(Port())
     }
 
-    expect(throws).toThrow()
+    expect(throws).toThrow(
+      new TypeError('Unable to derive port name'),
+    )
   })
 
   test('adds listener for port.onDisconnect', () => {
@@ -116,6 +117,9 @@ describe('handleDisconnect', () => {
     const logError = console.error
     console.error = jest.fn()
 
+    // @types/chrome is wrong
+    // chrome.runtime.lastError = { message: 'string' } | undefined
+    // @ts-ignore
     chrome.runtime.lastError = undefined
 
     const portName = 'background'

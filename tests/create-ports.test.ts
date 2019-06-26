@@ -1,6 +1,6 @@
 import * as assert from 'power-assert'
-import { chrome, chromep, Port, Tab } from './jest.setup'
 import { createPorts } from '../src/create-ports'
+import { Port } from './jest.setup'
 
 beforeEach(() => {
   jest.clearAllMocks()

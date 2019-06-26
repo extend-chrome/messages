@@ -1,5 +1,4 @@
 import * as assert from 'power-assert'
-import { chrome, chromep, Port, Tab } from './jest.setup'
 import { createEvent } from '../src/create-event'
 
 beforeEach(() => {
