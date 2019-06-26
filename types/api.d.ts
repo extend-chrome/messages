@@ -12,7 +12,23 @@
 type SendMessage = (
   message: JsonifiableData,
   target?: TargetName,
-) => void | Promise<JsonifiableData>
+) => Promise<JsonifiableData>
+
+/**
+ * Public API.
+ *
+ * Send a message to another extension script. The target must be listening via event listener or subscription.
+ *
+ * __Extension Pages:__ Use the frame name of the extension page (`background`, `options`, or `popup`), or a custom value.
+ *
+ * __Content Scripts:__ Use the tab id of the content script.
+ *
+ * __Other Extensions:__ Sending a message to another extension is not currently supported.
+ */
+type SendOnlyMessage = (
+  message: JsonifiableData,
+  target?: TargetName,
+) => void
 
 /**
  * Public API.
