@@ -11,7 +11,8 @@
  */
 type SendMessage = (
   message: JsonifiableData,
-  target?: TargetName,
+  target: TargetName,
+  sender?: TargetName,
 ) => Promise<JsonifiableData>
 
 /**
@@ -27,27 +28,8 @@ type SendMessage = (
  */
 type SendOnlyMessage = (
   message: JsonifiableData,
-  target?: TargetName,
+  target: TargetName,
 ) => void
-
-/**
- * Public API.
- *
- * Listen for messages from other scripts.
- */
-type AddListener = (
-  listener: MessageListener,
-  targetName?: string,
-) => void
-
-/**
- * Public API.
- *
- * Stop listening for messages from other scripts.
- *
- * Call with the listener function you wish to remove.
- */
-type RemoveListener = (listener: MessageListener) => void
 
 /**
  * Public API.

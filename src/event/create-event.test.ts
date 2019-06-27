@@ -1,11 +1,12 @@
 import * as assert from 'power-assert'
-import { createEvent } from '../src/create-event'
+import { createEvent } from './create-event'
 
 beforeEach(() => {
   jest.clearAllMocks()
 })
 
-describe('EventIterator', () => {
+// TODO: test CallableNamedEvent
+describe('CallableEvent', () => {
   test('hasListeners', () => {
     const selector = (x: any) => [x]
     const event = createEvent(selector)
@@ -92,19 +93,19 @@ describe('EventIterator', () => {
     expect(spy2).not.toBeCalled()
   })
 
-  test('next 1', () => {
+  test('callListeners 1', () => {
     const selector = (x: any) => [x]
     const event = createEvent(selector)
     const spy = jest.fn()
 
     event.addListener(spy)
-    event.next('test')
+    event.callListeners('test')
 
     expect(spy).toBeCalled()
     expect(spy).toBeCalledWith('test')
   })
 
-  test('next 2', () => {
+  test('callListeners 2', () => {
     const selector = (x: any) => [x, 1]
     const event = createEvent(selector)
     const spy1 = jest.fn()
@@ -112,10 +113,10 @@ describe('EventIterator', () => {
 
     event.addListener(spy1)
     event.addListener(spy2)
-    event.next('test1')
-    event.next('test2')
+    event.callListeners('test1')
+    event.callListeners('test2')
     event.removeListener(spy1)
-    event.next('test3')
+    event.callListeners('test3')
 
     expect(spy1).toBeCalledTimes(2)
     expect(spy1).toBeCalledWith('test1', 1)
@@ -128,13 +129,13 @@ describe('EventIterator', () => {
     expect(spy2).toBeCalledWith('test3', 1)
   })
 
-  test('next 3', () => {
+  test('callListeners 3', () => {
     const selector = (x: string, y: number) => Array(y).fill(x)
     const event = createEvent(selector)
     const spy = jest.fn()
 
     event.addListener(spy)
-    event.next('test', 3)
+    event.callListeners('test', 3)
 
     expect(spy).toBeCalled()
     expect(spy).toBeCalledWith('test', 'test', 'test')
@@ -157,7 +158,7 @@ describe('createEvent', () => {
     event2.addListener(spy2)
 
     const event = { message: 'test' }
-    event1.next(event)
+    event1.callListeners(event)
 
     expect(spy1).toBeCalled()
     expect(spy2).not.toBeCalled()

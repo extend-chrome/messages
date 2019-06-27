@@ -18,13 +18,12 @@ describe('send', () => {
     const port2 = Port(name2)
     ports.set(name2, port2)
 
-    const message: JsonifiableMessage = {
+    const message: CoreMessage = {
       id: 'asdf12334',
       target: 'options',
       payload: {
         greeting: 'set-options',
       },
-      only: true,
     }
     send(message.payload, message.target)
 
@@ -44,7 +43,7 @@ describe('send', () => {
       if (once === 0) {
         once++
 
-        const response: JsonifiableResponse = {
+        const response: CoreResponse = {
           id,
           payload: 'hey yourself',
           success: true,
@@ -72,7 +71,7 @@ describe('send', () => {
       if (once === 0) {
         once++
 
-        const response1: JsonifiableResponse = {
+        const response1: CoreResponse = {
           id: 'abc123',
           payload: 'other',
           success: true,
@@ -80,7 +79,7 @@ describe('send', () => {
         }
         port1.postMessage(response1)
 
-        const response2: JsonifiableResponse = {
+        const response2: CoreResponse = {
           id,
           payload: 'hey yourself',
           success: true,
@@ -108,7 +107,7 @@ describe('send', () => {
       if (once === 0) {
         once++
 
-        const response2: JsonifiableResponse = {
+        const response2: CoreResponse = {
           id,
           payload: 'some error',
           success: false,
@@ -134,13 +133,12 @@ describe('onlySend', () => {
     const port2 = Port(name2)
     ports.set(name2, port2)
 
-    const message: JsonifiableMessage = {
+    const message: CoreMessage = {
       id: 'asdf12334',
-      target: 'options',
+      target: name2,
       payload: {
         greeting: 'set-options',
       },
-      only: true,
     }
     onlySend(message.payload, message.target)
 
@@ -161,7 +159,7 @@ describe('onlySend', () => {
     expect(result).toBeUndefined()
   })
 
-  test('rejects if setupSend throws', async () => {
+  test('rejects if setupSend throws', () => {
     expect.assertions(1)
 
     const name1 = 'background'
@@ -171,25 +169,8 @@ describe('onlySend', () => {
     const payload = 'hey there'
     const target = 'options'
 
-    expect(onlySend(payload, target)).rejects.toEqual(
+    return expect(onlySend(payload, target)).rejects.toEqual(
       new Error(`The port "${target}" is not registered`),
-    )
-  })
-
-  test('rejects if cannot derive target', async () => {
-    expect.assertions(1)
-
-    const name1 = 'background'
-    const port1 = Port(name1)
-    ports.set(name1, port1)
-
-    const payload = 'hey there'
-
-    // Simulate unable to derive port name
-    expect(onlySend(payload, '')).rejects.toEqual(
-      new Error(
-        'Could not derive target port name or port name is empty string',
-      ),
     )
   })
 

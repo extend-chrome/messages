@@ -1,32 +1,31 @@
 import { uuidv4 as uuid } from './uuidv4'
 import { ports } from './ports'
-import { frameName } from './frames'
 
 const setupSend = (
   message: JsonifiableData,
-  target: TargetName | undefined,
-): { _message: JsonifiableMessage; port: Port } => {
-  const _target = target === undefined ? frameName : target
-  const port = ports.get(_target)
-
-  if (!_target) {
-    throw new Error(
-      'Could not derive target port name or port name is empty string',
-    )
-  }
+  target: TargetName,
+  sender?: TargetName,
+): {
+  _message: CoreMessage
+  port: Port
+} => {
+  const port = ports.get(target)
 
   if (!port) {
-    throw new Error(`The port "${_target}" is not registered`)
+    throw new Error(`The port "${target}" is not registered`)
   }
 
-  const _message: JsonifiableMessage = {
+  const _message = {
     id: uuid(),
     payload: message,
-    target: _target,
-    only: false,
+    target,
+    sender,
   }
 
-  return { _message, port }
+  return {
+    _message,
+    port,
+  }
 }
 
 /**
@@ -36,10 +35,14 @@ const setupSend = (
  * @param message Send any JSON-ifiable data.
  * @param target "background", "options", "popup", or a custom target name as a `string` or a tab id as a `number`.
  */
-export const send: SendMessage = (message, target) =>
+export const send: SendMessage = (message, target, sender) =>
   new Promise((resolve, reject) => {
     try {
-      const { _message, port } = setupSend(message, target)
+      const { _message, port } = setupSend(
+        message,
+        target,
+        sender,
+      )
 
       port.onMessage.addListener(handleMessage)
       port.postMessage(_message)
@@ -48,7 +51,7 @@ export const send: SendMessage = (message, target) =>
         id,
         success,
         payload,
-      }: JsonifiableResponse) {
+      }: CoreResponse) {
         if (id === _message.id) {
           port.onMessage.removeListener(handleMessage)
           if (success === true) {

@@ -13,11 +13,15 @@ type JsonifiableData =
  * Use to send a message to another script through a port.
  * Must contain only JSON compatible data.
  */
-interface JsonifiableMessage {
+interface CoreMessage {
   id: string
-  target: number | string
+  target: TargetName
+  sender?: TargetName
   payload: JsonifiableData
-  only: boolean
+}
+
+interface RespondableMessage extends CoreMessage {
+  sender: TargetName
 }
 
 /**
@@ -28,20 +32,11 @@ interface JsonifiableMessage {
  *
  * Must have the same message id as initial Message.
  */
-interface JsonifiableResponse {
+interface CoreResponse {
   id: string
-  target: number | string
+  target: TargetName
   payload: JsonifiableData
   success: boolean
-}
-
-/**
- * Default names for extension frames, aka, privileged scripts.
- */
-declare enum FrameName {
-  'background',
-  'options',
-  'popup',
 }
 
 /**
@@ -50,4 +45,9 @@ declare enum FrameName {
  * Can be a default frame name ("background", "options", or "popup"),
  * a custom frame name, or a content script tab id.
  */
-type TargetName = FrameName | number | string
+type TargetName =
+  | 'background'
+  | 'popup'
+  | 'options'
+  | number
+  | string

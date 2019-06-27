@@ -1,4 +1,4 @@
-import { createEvent } from './create-event'
+import { createEvent } from './event/create-event'
 
 export const createPorts = (): Ports => {
   const _ports: Map<PortName, Port> = new Map()
@@ -14,8 +14,8 @@ export const createPorts = (): Ports => {
 
   const setPort = (key: PortName, port: Port): Ports => {
     _ports.set(key, port)
-    onConnect.next(key, port)
-    port.onMessage.addListener(onMessage.next)
+    onConnect.callListeners(key, port)
+    port.onMessage.addListener(onMessage.callListeners)
 
     return ports
   }

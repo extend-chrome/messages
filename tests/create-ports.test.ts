@@ -24,16 +24,15 @@ describe('createPorts', () => {
     ports2.onMessage.addListener(spy2)
 
     const port = Port('background')
-    const message: JsonifiableMessage = {
+    const message: CoreMessage = {
       id: 'asdf12334',
       target: 'options',
       payload: {
         greeting: 'set-options',
       },
-      only: true,
     }
 
-    ports1.onMessage.next(message, port)
+    ports1.onMessage.callListeners(message, port)
 
     expect(spy1).toBeCalled()
     expect(spy2).not.toBeCalled()
@@ -185,7 +184,7 @@ describe('Ports#onMessage', () => {
     const spy = jest.fn()
     ports.onMessage.addListener(spy)
 
-    const message: JsonifiableMessage = {
+    const message: CoreMessage = {
       id: 'asdf12334',
       target: 'options',
       payload: {

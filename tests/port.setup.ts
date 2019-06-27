@@ -37,7 +37,7 @@ export const Tab = ({
 ): chrome.runtime.Port => {
   const _onMessage: Set<
     (
-      message: JsonifiableMessage,
+      message: CoreMessage,
       port: chrome.runtime.Port,
     ) => void
   > = new Set()

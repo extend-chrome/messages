@@ -1,30 +1,3 @@
-/** An object which allows the addition, removal, and invocation of listener functions. */
-interface EventIterator<T, N> {
-  /**
-   * Registers an event listener callback to an event.
-   * @param callback Called when an event occurs. The parameters of this function depend on the type of event.
-   * The callback parameter should be a function that looks like this:
-   * function() {...};
-   */
-  addListener(callback: T): void
-  /**
-   * @param callback Listener whose registration status shall be tested.
-   */
-  hasListener(callback: T): boolean
-  hasListeners(): boolean
-  /**
-   * Deregisters an event listener callback from an event.
-   * @param callback Listener that shall be unregistered.
-   * The callback parameter should be a function that looks like this:
-   * function() {...};
-   */
-  removeListener(callback: T): void
-  /**
-   * Calls all listeners with a data argument.
-   */
-  next: N
-}
-
 /**
  * An object which allows two way communication with other pages.
  */
@@ -81,12 +54,8 @@ interface Ports {
    * Event that fires when a port receives a message
    */
   onMessage: EventIterator<
-    (
-      message: JsonifiableMessage,
-      port: Port,
-      ports: Ports,
-    ) => void,
-    (message: JsonifiableMessage, port: Port) => void
+    (message: CoreMessage, port: Port, ports: Ports) => void,
+    (message: CoreMessage, port: Port) => void
   >
 
   /**
@@ -101,11 +70,11 @@ interface Ports {
  *
  * Send a response to a script. Id must match previously received message.
  */
-type PrivateRespond = (message: JsonifiableResponse) => void
+type PrivateRespond = (message: CoreResponse) => void
 
 /**
  * Private API.
  *
  * Send a message to a script. Id should be unique.
  */
-type PrivateSend = (message: JsonifiableMessage) => void
+type PrivateSend = (message: CoreMessage) => void
