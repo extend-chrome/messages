@@ -1,11 +1,9 @@
-type EventSelector = (...args: any[]) => any[] | null
-
 export const createEvent = (
   selector: EventSelector,
-  options?: boolean,
+  validator?: OptionsSelector,
 ) => {
-  if (options) {
-    return createMapEvent(selector)
+  if (validator) {
+    return createMapEvent(selector, validator)
   } else {
     return createSetEvent(selector)
   }
@@ -57,7 +55,10 @@ export const createSetEvent = (selector: EventSelector) => {
   }
 }
 
-export const createMapEvent = (selector: EventSelector) => {
+export const createMapEvent = (
+  eventSelector: EventSelector,
+  optionsSelector?: OptionsSelector,
+) => {
   const _cbs: Map<Function, any[]> = new Map()
 
   return {
@@ -77,8 +78,13 @@ export const createMapEvent = (selector: EventSelector) => {
     },
   }
 
-  function addListener(cb: Function, ...options: any) {
-    _cbs.set(cb, options)
+  function addListener(cb: Function, ...options: any[]) {
+    const _options =
+      (typeof optionsSelector === 'function' &&
+        optionsSelector(...options)) ||
+      options
+
+    _cbs.set(cb, _options)
   }
   function hasListener(cb: Function) {
     return _cbs.has(cb)
@@ -88,7 +94,7 @@ export const createMapEvent = (selector: EventSelector) => {
   }
   function callListeners(...args: any[]) {
     _cbs.forEach((options, cb) => {
-      const cbArgs = selector(...options, ...args)
+      const cbArgs = eventSelector(...options, ...args)
 
       if (cbArgs) {
         cb(...cbArgs)

@@ -1,32 +1,6 @@
 import { uuidv4 as uuid } from './uuidv4'
-import { ports } from './ports'
-
-const setupSend = (
-  message: JsonifiableData,
-  target: TargetName,
-  sender?: TargetName,
-): {
-  _message: CoreMessage
-  port: Port
-} => {
-  const port = ports.get(target)
-
-  if (!port) {
-    throw new Error(`The port "${target}" is not registered`)
-  }
-
-  const _message = {
-    id: uuid(),
-    payload: message,
-    target,
-    sender,
-  }
-
-  return {
-    _message,
-    port,
-  }
-}
+import { connectTo } from './connect'
+import { frameName } from './frames'
 
 /**
  * Send a message to another script. Use when you need to get a response.
@@ -36,13 +10,16 @@ const setupSend = (
  * @param target "background", "options", "popup", or a custom target name as a `string` or a tab id as a `number`.
  */
 export const send: SendMessage = (message, target, sender) =>
-  new Promise((resolve, reject) => {
+  new Promise(async (resolve, reject) => {
     try {
-      const { _message, port } = setupSend(
-        message,
+      const port = await connectTo(target)
+
+      const _message: RespondableMessage = {
+        id: uuid(),
+        payload: message,
         target,
-        sender,
-      )
+        sender: sender || frameName,
+      }
 
       port.onMessage.addListener(handleMessage)
       port.postMessage(_message)
@@ -56,7 +33,7 @@ export const send: SendMessage = (message, target, sender) =>
           port.onMessage.removeListener(handleMessage)
           if (success === true) {
             resolve(payload)
-          } else if (success === false) {
+          } else {
             reject(payload)
           }
         }
@@ -73,9 +50,15 @@ export const send: SendMessage = (message, target, sender) =>
  * @param target "background", "options", "popup", or a custom target name as a `string` or a tab id as a `number`.
  */
 export const onlySend: SendOnlyMessage = (message, target) =>
-  new Promise((resolve, reject) => {
+  new Promise(async (resolve, reject) => {
     try {
-      const { _message, port } = setupSend(message, target)
+      const port = await connectTo(target)
+
+      const _message: CoreMessage = {
+        id: uuid(),
+        payload: message,
+        target,
+      }
 
       port.postMessage(_message)
 

@@ -160,7 +160,7 @@ describe('Ports#onConnect', () => {
     expect(spy).toBeCalledWith(name, port, ports)
   })
 
-  test('adds listener to port.onMessage', () => {
+  test('does not listen to port.onMessage', () => {
     const ports = createPorts()
 
     const name = 'background'
@@ -169,32 +169,7 @@ describe('Ports#onConnect', () => {
 
     const spy = port.onMessage.addListener
 
-    expect(spy).toBeCalled()
-  })
-})
-
-describe('Ports#onMessage', () => {
-  test('fires on new message', () => {
-    const ports = createPorts()
-
-    const name = 'background'
-    const port = Port(name)
-    ports.set(name, port)
-
-    const spy = jest.fn()
-    ports.onMessage.addListener(spy)
-
-    const message: CoreMessage = {
-      id: 'asdf12334',
-      target: 'options',
-      payload: {
-        greeting: 'set-options',
-      },
-      only: true,
-    }
-    port.postMessage(message)
-
-    expect(spy).toBeCalled()
+    expect(spy).not.toBeCalled()
   })
 })
 

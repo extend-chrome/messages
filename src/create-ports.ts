@@ -4,7 +4,6 @@ export const createPorts = (): Ports => {
   const _ports: Map<PortName, Port> = new Map()
 
   const onConnect = createEvent((name, port) => {
-    // TODO: link port.onMessage to onMessage
     return [name, port, ports]
   })
 
@@ -15,9 +14,14 @@ export const createPorts = (): Ports => {
   const setPort = (key: PortName, port: Port): Ports => {
     _ports.set(key, port)
     onConnect.callListeners(key, port)
-    port.onMessage.addListener(onMessage.callListeners)
+    port.onDisconnect.addListener(() => {
+      _ports.delete(key)
+    })
 
     return ports
+
+    // connect port won't send listeners
+    // port.onMessage.addListener(onMessage.callListeners)
   }
 
   const clearPorts = () => {
@@ -35,15 +39,15 @@ export const createPorts = (): Ports => {
       port.disconnect()
     }
 
-    return _ports.delete(key)
+    return !!port
   }
 
   const ports: Ports = {
+    onConnect,
+    onMessage,
     set: setPort,
     clear: clearPorts,
     delete: deletePort,
-    onConnect,
-    onMessage,
     get size() {
       return _ports.size
     },

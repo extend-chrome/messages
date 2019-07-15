@@ -4,6 +4,8 @@ import { ports } from '../src/ports'
 
 jest.mock('../src/frames')
 
+jest.setTimeout(500)
+
 afterEach(() => {
   ports.clear()
 })
@@ -31,13 +33,14 @@ describe('onMessage', () => {
       payload: 'should receive',
     }
 
-    onMessage.addListener((received) => {
+    onMessage.addListener(handleMessage, name1)
+    onMessage.callListeners(respondable, port2)
+
+    function handleMessage(received: any) {
       expect(received).toBe(respondable.payload)
 
       done()
-    }, name1)
-
-    port2.postMessage(respondable)
+    }
   })
 
   test('receives respondable message', (done) => {
@@ -62,7 +65,7 @@ describe('onMessage', () => {
 
     onMessage.addListener(handleMessage, name1)
 
-    port2.postMessage(respondable)
+    onMessage.callListeners(respondable, port2)
 
     function handleMessage(received: any) {
       expect(received).toBe(respondable.payload)
@@ -97,8 +100,8 @@ describe('onMessage', () => {
 
     onMessage.addListener(handleMessage, name1)
 
-    port2.postMessage(message)
-    port2.postMessage(respondable)
+    onMessage.callListeners(message, port2)
+    onMessage.callListeners(respondable, port2)
 
     function handleMessage(received: any) {
       expect(received).toEqual(respondable.payload)
@@ -128,16 +131,12 @@ describe('onMessage', () => {
     }
 
     onMessage.addListener(handleMessage, name1)
-
-    port2.postMessage(respondable)
+    onMessage.callListeners(respondable, port2)
 
     function handleMessage(
       received: any,
       sendResponse: SendResponse,
     ) {
-      // @ts-ignore
-      port2.postMessage.mockClear()
-
       sendResponse('respond this')
 
       expect(port2.postMessage).toBeCalled()
@@ -163,19 +162,21 @@ describe('onOnlyMessage', () => {
     const port2 = Port(name2)
     ports.set(name2, port2)
 
-    const respondable: CoreMessage = {
+    const message: CoreMessage = {
       id: 'asdf12334',
       target: name1,
-      payload: 'should receive',
+      payload: 'message',
     }
 
-    onOnlyMessage.addListener((received) => {
-      expect(received).toBe(respondable.payload)
+    onOnlyMessage.addListener(handleMessage, name1)
+
+    onOnlyMessage.callListeners(message, port2)
+
+    function handleMessage(received: any) {
+      expect(received).toBe(message.payload)
 
       done()
-    }, name1)
-
-    port2.postMessage(respondable)
+    }
   })
 
   test('receives only message', (done) => {
@@ -189,20 +190,18 @@ describe('onOnlyMessage', () => {
     const port2 = Port(name2)
     ports.set(name2, port2)
 
-    const respondable: CoreMessage = {
+    const message: CoreMessage = {
       id: 'asdf12334',
       target: name1,
-      payload: {
-        greeting: 'set-options',
-      },
+      payload: 'message',
     }
 
     onOnlyMessage.addListener(handleMessage, name1)
 
-    port2.postMessage(respondable)
+    onOnlyMessage.callListeners(message, port2)
 
     function handleMessage(received: any) {
-      expect(received).toBe(respondable.payload)
+      expect(received).toBe(message.payload)
 
       done()
     }
@@ -234,8 +233,8 @@ describe('onOnlyMessage', () => {
 
     onOnlyMessage.addListener(handleMessage, name1)
 
-    port2.postMessage(respondable)
-    port2.postMessage(message)
+    onOnlyMessage.callListeners(respondable, port2)
+    onOnlyMessage.callListeners(message, port2)
 
     function handleMessage(received: any) {
       expect(received).toEqual(message.payload)

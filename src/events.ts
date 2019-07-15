@@ -1,14 +1,32 @@
 import { ports } from './ports'
 import { createEvent } from './event/create-event'
+import { frameName } from './frames'
 
-declare type OnMessageSelector = (
+declare type EventSelector = (
   ownName: TargetName,
   message: RespondableMessage,
   port: Port,
 ) => any[] | null
 
-export const createOnMessage = (selector: OnMessageSelector) => {
-  const onMessage = createEvent(selector, true)
+declare type OptionsSelector = (
+  ownName: TargetName,
+) => any[] | void
+
+const addListenerOptionsSelector: OptionsSelector = (
+  ownName,
+) => {
+  if (!ownName) {
+    return [frameName]
+  } else {
+    return [ownName]
+  }
+}
+
+export const createOnMessage = (
+  eventSelector: EventSelector,
+  optionsSelector: OptionsSelector,
+) => {
+  const onMessage = createEvent(eventSelector, optionsSelector)
 
   ports.onMessage.addListener(onMessage.callListeners)
 
@@ -44,10 +62,9 @@ export const onMessage: CallableNamedEvent<
       success: true,
     }
 
-    // TODO: how to reject?
     port.postMessage(response)
   }
-})
+}, addListenerOptionsSelector)
 
 /**
  * Add a listener for messages sent using `messages.onlySend`.
@@ -55,7 +72,7 @@ export const onMessage: CallableNamedEvent<
  * The optional targetName may be used to designate a custom name for that listener.
  * Use this targetName as the second argument in `messages.onlySend`.
  *
- * The event listener receives one argument, the message.
+ * The event listener receives two arguments, the message and an optional listener name.
  */
 export const onOnlyMessage: CallableNamedEvent<
   (message: JsonifiableData) => void,
@@ -66,4 +83,4 @@ export const onOnlyMessage: CallableNamedEvent<
   }
 
   return [message.payload]
-})
+}, addListenerOptionsSelector)

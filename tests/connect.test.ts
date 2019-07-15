@@ -1,15 +1,16 @@
 import * as assert from 'power-assert'
 import {
-  connect,
-  connectAs,
+  connectTo,
+  startConnections,
   handleConnect,
-  handleDisconnect,
 } from '../src/connect'
 import { ports } from '../src/ports'
 import { chrome, Port, Tab } from './jest.setup'
 
-jest.mock('../src/connect')
 jest.mock('../src/frames')
+
+// We don't need logs here
+console.log = () => {}
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -18,26 +19,45 @@ beforeEach(() => {
   chrome.runtime.connect.returns(Port('test'))
 
   ports.clear()
-  delete ports.self
 })
 
-describe('connect', () => {
+describe('startConnections', () => {
+  test('adds listener for chrome.runtime.onConnect', () => {
+    startConnections()
+
+    assert(chrome.runtime.onConnect.addListener.called)
+  })
+})
+
+describe('connectTo', () => {
   beforeEach(() => {
-    chrome.runtime.connect.returns(Port('test'))
+    chrome.runtime.connect.callsFake((options) => {
+      const port = Port(options.name)
+
+      ports.set(options.name, port)
+      chrome.runtime.onConnect.triggerAsync(port)
+
+      return port
+    })
+
+    chrome.tabs.connect.callsFake((tabId, options) => {
+      const port = Port(options.name, { tab: Tab(tabId) })
+
+      ports.set(options.name, port)
+      chrome.runtime.onConnect.triggerAsync(port)
+
+      return port
+    })
   })
 
-  test('should be mocked', () => {
-    assert(jest.isMockFunction(connect))
-  })
-
-  test('calls chrome.runtime.connect', () => {
-    connect('test')
+  test('calls chrome.runtime.connect', async () => {
+    await connectTo('test', { timeout: 500 })
 
     assert(chrome.runtime.connect.called)
   })
 
-  test('adds listener for port.onDisconnect', () => {
-    const port = connect('test')
+  test('adds listener for port.onDisconnect', async () => {
+    const port = await connectTo('test', { timeout: 500 })
 
     expect(port.onDisconnect.addListener).toBeCalled()
   })
@@ -84,56 +104,7 @@ describe('handleConnect', () => {
     expect(port.onDisconnect.addListener).toBeCalled()
   })
 
-  test('calls connect', () => {
-    const portName = 'background'
-    const port = Port(portName)
-
-    handleConnect(port)
-
-    expect(ports.self).toBeDefined()
-  })
-})
-
-describe('handleDisconnect', () => {
-  test('logs last error', () => {
-    const logError = console.error
-    console.error = jest.fn()
-
-    const message = 'there was an error!'
-    chrome.runtime.lastError = { message }
-
-    const portName = 'background'
-    const port = Port(portName)
-
-    handleConnect(port)
-    handleDisconnect(portName)(port)
-
-    expect(console.error).toBeCalledWith(message)
-
-    console.error = logError
-  })
-
-  test('does not log if no error', () => {
-    const logError = console.error
-    console.error = jest.fn()
-
-    // @types/chrome is wrong
-    // chrome.runtime.lastError = { message: 'string' } | undefined
-    // @ts-ignore
-    chrome.runtime.lastError = undefined
-
-    const portName = 'background'
-    const port = Port(portName)
-
-    handleConnect(port)
-    handleDisconnect(portName)(port)
-
-    expect(console.error).not.toBeCalled()
-
-    console.error = logError
-  })
-
-  test('deletes port', () => {
+  test('deletes port on disconnect', () => {
     const portName = 'background'
     const port = Port(portName)
 
@@ -141,22 +112,8 @@ describe('handleDisconnect', () => {
 
     assert(ports.has('background'))
 
-    handleDisconnect(portName)(port)
+    port.disconnect()
 
     assert(!ports.has('background'))
-  })
-})
-
-describe('connectAs', () => {
-  test('adds listener for chrome.runtime.onConnect', () => {
-    connectAs()
-
-    assert(chrome.runtime.onConnect.addListener.called)
-  })
-
-  test('calls connect', () => {
-    connectAs()
-
-    expect(ports.self).toBeDefined()
   })
 })

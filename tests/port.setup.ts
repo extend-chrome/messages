@@ -36,26 +36,39 @@ export const Tab = ({
   sender?: chrome.runtime.MessageSender,
 ): chrome.runtime.Port => {
   const _onMessage: Set<
-    (
-      message: CoreMessage,
-      port: chrome.runtime.Port,
-    ) => void
+    (message: CoreMessage, port: chrome.runtime.Port) => void
   > = new Set()
-  const _onDisconnect = new Set()
+
+  const _onDisconnect: Set<
+    (port: chrome.runtime.Port) => void
+  > = new Set()
+
+  let _disconnected = false
 
   const port: chrome.runtime.Port = {
     name,
 
     /**
-     * Fires own onMessage listeners
+     * Simulates a response
      */
     postMessage: jest.fn((message: any) => {
-      _onMessage.forEach((cb) => {
-        cb(message, port)
-      })
+      if (!_disconnected) {
+        const _message = { success: true, ...message }
+
+        _onMessage.forEach((cb) => {
+          cb(_message, port)
+        })
+      }
     }),
 
-    disconnect: jest.fn(),
+    disconnect: jest.fn(() => {
+      if (!_disconnected) {
+        _disconnected = true
+        _onDisconnect.forEach((cb) => {
+          cb(port)
+        })
+      }
+    }),
 
     onMessage: {
       addListener: jest.fn((cb) => {

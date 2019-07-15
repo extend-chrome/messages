@@ -1,3 +1,6 @@
+type EventSelector = (...args: any[]) => any[] | null
+type OptionsSelector = (...options: any[]) => any[] | void
+
 /** An object which allows the addition, removal, and invocation of listener functions. */
 type CoreEvent<T> = {
   /**

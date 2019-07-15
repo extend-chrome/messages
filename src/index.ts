@@ -1,5 +1,18 @@
 import * as events from './events'
-export { send, onlySend } from './send'
+import { send, onlySend } from './send'
+import { startConnections } from './connect'
 
-export const onMessage = events.onMessage.getEvent()
-export const onOnlyMessage = events.onOnlyMessage.getEvent()
+startConnections()
+
+const onMessage = events.onMessage.getEvent()
+const onOnlyMessage = events.onOnlyMessage.getEvent()
+
+export const messages = {
+  send,
+  onlySend,
+  onMessage,
+  onOnlyMessage,
+}
+
+export { frameName } from './frames'
+export { ports } from './ports'

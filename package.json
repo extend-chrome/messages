@@ -1,5 +1,5 @@
 {
-  "name": "@bumble/message",
+  "name": "@bumble/messages",
   "version": "0.1.0",
   "private": true,
   "description": "An API for Chrome extension messages that makes sense.",

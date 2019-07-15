@@ -46,22 +46,18 @@ interface Ports {
   /**
    * Event that fires when a port is added
    */
-  onConnect: EventIterator<
+  onConnect: CallableEvent<
     (name: PortName, port: Port, ports: Ports) => void,
     (name: PortName, port: Port) => void
   >
   /**
    * Event that fires when a port receives a message
    */
-  onMessage: EventIterator<
+  onMessage: CallableEvent<
     (message: CoreMessage, port: Port, ports: Ports) => void,
     (message: CoreMessage, port: Port) => void
   >
 
-  /**
-   * Return value of chrome.runtime.connect
-   */
-  self?: Port
   size: number
 }
 

@@ -3,9 +3,13 @@ import { send, onlySend } from '../src/send'
 import { Port } from './jest.setup'
 
 jest.mock('../src/frames')
+jest.setTimeout(500)
 
 beforeEach(() => {
   ports.clear()
+
+  // @ts-ignore
+  chrome.runtime.connect.returns(Port(''))
 })
 
 describe('send', () => {
@@ -25,7 +29,7 @@ describe('send', () => {
         greeting: 'set-options',
       },
     }
-    send(message.payload, message.target)
+    await send(message.payload, message.target)
 
     expect(port1.postMessage).not.toBeCalled()
     expect(port2.postMessage).toBeCalled()
@@ -95,15 +99,14 @@ describe('send', () => {
     expect(result).toBe('hey yourself')
   })
 
-  test('rejects on failure', async () => {
-    expect.assertions(1)
-
+  test('rejects on failure', () => {
     const name1 = 'background'
     const port1 = Port(name1)
     ports.set(name1, port1)
 
     let once = 0
-    port1.onMessage.addListener(({ id }) => {
+    // @ts-ignore
+    port1.postMessage.mockImplementationOnce(({ id }) => {
       if (once === 0) {
         once++
 
@@ -119,7 +122,9 @@ describe('send', () => {
 
     const payload = 'hey there'
 
-    expect(send(payload, name1)).rejects.toBe('some error')
+    return expect(send(payload, name1)).rejects.toBe(
+      'some error',
+    )
   })
 })
 
@@ -140,7 +145,7 @@ describe('onlySend', () => {
         greeting: 'set-options',
       },
     }
-    onlySend(message.payload, message.target)
+    await onlySend(message.payload, message.target)
 
     expect(port1.postMessage).not.toBeCalled()
     expect(port2.postMessage).toBeCalled()
@@ -159,7 +164,7 @@ describe('onlySend', () => {
     expect(result).toBeUndefined()
   })
 
-  test('rejects if setupSend throws', () => {
+  test.only('rejects if page is not registered', (done) => {
     expect.assertions(1)
 
     const name1 = 'background'
@@ -169,12 +174,16 @@ describe('onlySend', () => {
     const payload = 'hey there'
     const target = 'options'
 
-    return expect(onlySend(payload, target)).rejects.toEqual(
-      new Error(`The port "${target}" is not registered`),
-    )
+    return onlySend(payload, target).catch((error) => {
+      expect(error).toEqual(
+        new Error(`The port "${target}" is not registered`),
+      )
+
+      done()
+    })
   })
 
-  test('rejects if postMessage throws', async () => {
+  test('rejects if postMessage throws', () => {
     expect.assertions(1)
 
     const name1 = 'background'
@@ -189,6 +198,8 @@ describe('onlySend', () => {
 
     const payload = 'hey there'
 
-    expect(onlySend(payload, name1)).rejects.toBe(postError)
+    return expect(onlySend(payload, name1)).rejects.toBe(
+      postError,
+    )
   })
 })

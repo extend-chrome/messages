@@ -29,7 +29,7 @@ type SendMessage = (
 type SendOnlyMessage = (
   message: JsonifiableData,
   target: TargetName,
-) => void
+) => Promise<void>
 
 /**
  * Public API.
