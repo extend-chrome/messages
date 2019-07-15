@@ -40,3 +40,5 @@ export const getFrameName = (): string => {
     }
   }
 }
+
+export const frameName = getFrameName()

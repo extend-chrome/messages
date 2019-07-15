@@ -1,1 +1,1 @@
-# @Bumble/message
+# @Bumble/messages

@@ -1,4 +1,4 @@
-import { ports } from './ports'
+import { ports } from '../src/ports'
 import { createEvent } from './event/create-event'
 import { frameName } from './frames'
 

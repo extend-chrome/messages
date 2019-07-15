@@ -1,5 +1,4 @@
 import * as chrome from 'sinon-chrome'
-import { Port, Tab } from './port.setup'
 
 chrome.runtime.id = 'foo123' // Fix for schema.json
 
@@ -14,6 +13,8 @@ Object.defineProperty(chrome.extension, 'sendRequest', {
 var ChromePromise = require('chrome-promise/constructor')
 
 var chromep = new ChromePromise({ chrome })
+;(<any>window).chrome = chrome
+;(<any>window).chromep = chromep
 
 var nodeCrypto = require('crypto')
 ;(<any>window).crypto = {
@@ -21,7 +22,3 @@ var nodeCrypto = require('crypto')
     return nodeCrypto.randomFillSync(buffer)
   },
 }
-
-export { chrome, chromep, Port, Tab }
-;(<any>window).chrome = chrome
-;(<any>window).chromep = chromep

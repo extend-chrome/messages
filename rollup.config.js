@@ -8,12 +8,12 @@ export default [
     input: 'src/index.ts',
     output: [
       {
-        file: 'build/bundle-esm.js',
+        file: 'build/bumble-messages-esm.js',
         format: 'esm',
         sourcemap: 'inline',
       },
       {
-        file: 'build/bundle-cjs.js',
+        file: 'build/bumble-messages-cjs.js',
         format: 'cjs',
         sourcemap: 'inline',
       },

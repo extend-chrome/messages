@@ -64,7 +64,7 @@ connect()
  * Include `message.tabId` to send a message to a content script.
  * Set `message.async` to await a response.
  *
- * @param {Message} message - A Message object with optional data properties.
+ * @param {CoreMessage} message - A Message object with optional data properties.
  * @returns {Promise<MessageResponse>} Will resolve with a response if `message.async`, else will resolve immediately.
  *
  * @example

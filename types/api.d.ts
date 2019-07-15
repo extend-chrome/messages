@@ -9,7 +9,7 @@
  *
  * __Other Extensions:__ Sending a message to another extension is not currently supported.
  */
-type SendMessage = (
+type SendAsync = (
   message: JsonifiableData,
   target: TargetName,
   sender?: TargetName,
@@ -26,7 +26,7 @@ type SendMessage = (
  *
  * __Other Extensions:__ Sending a message to another extension is not currently supported.
  */
-type SendOnlyMessage = (
+type Send = (
   message: JsonifiableData,
   target: TargetName,
 ) => Promise<void>

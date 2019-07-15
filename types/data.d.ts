@@ -8,6 +8,19 @@ type JsonifiableData =
     }
 
 /**
+ * Designate the extension script to receive the message.
+ *
+ * Can be a default frame name ("background", "options", or "popup"),
+ * a custom frame name, or a content script tab id.
+ */
+type TargetName =
+  | 'background'
+  | 'popup'
+  | 'options'
+  | number
+  | string
+
+/**
  * Private interface.
  *
  * Use to send a message to another script through a port.
@@ -20,7 +33,7 @@ interface CoreMessage {
   payload: JsonifiableData
 }
 
-interface RespondableMessage extends CoreMessage {
+interface AsyncMessage extends CoreMessage {
   sender: TargetName
 }
 
@@ -38,16 +51,3 @@ interface CoreResponse {
   payload: JsonifiableData
   success: boolean
 }
-
-/**
- * Designate the extension script to receive the message.
- *
- * Can be a default frame name ("background", "options", or "popup"),
- * a custom frame name, or a content script tab id.
- */
-type TargetName =
-  | 'background'
-  | 'popup'
-  | 'options'
-  | number
-  | string
