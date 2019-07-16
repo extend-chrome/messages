@@ -1,8 +1,3 @@
-interface MessagePayload {
-  greeting: string
-  [prop: string]: any
-}
-
 /**
  * Designate the extension script to receive the message.
  *
@@ -23,8 +18,14 @@ type TargetName =
  * Must contain only JSON compatible data.
  */
 interface CoreMessage {
-  target: TargetName
+  async: boolean
+  target: TargetName | null
   payload: MessagePayload
+}
+
+interface MessagePayload {
+  greeting: string
+  [prop: string]: any
 }
 
 /**
@@ -36,4 +37,27 @@ interface CoreMessage {
 interface CoreResponse {
   success: boolean
   payload: MessagePayload
+}
+
+interface MessageListener {
+  (
+    message: MessagePayload,
+    sender: chrome.runtime.MessageSender,
+    sendResponse?: (response?: any) => void,
+  ): void
+}
+
+interface CoreListener {
+  (
+    coreMessage: CoreMessage,
+    sender: chrome.runtime.MessageSender,
+  ): void
+}
+
+interface AsyncListener {
+  (
+    coreMessage: CoreMessage,
+    sender: chrome.runtime.MessageSender,
+    sendResponse: (response?: any) => void,
+  ): void
 }

@@ -85,7 +85,7 @@ describe('messages.send', () => {
     const message: MessagePayload = { greeting: 'hello' }
     const target: TargetName = 'background'
 
-    const coreMessage = {
+    const coreMessage: CoreMessage = {
       async: false,
       target,
       payload: message,
@@ -188,7 +188,7 @@ describe('messages.sendAsync', () => {
     const message: MessagePayload = { greeting: 'hello' }
     const target: TargetName = 'background'
 
-    const coreMessage = {
+    const coreMessage: CoreMessage = {
       async: true,
       target,
       payload: message,

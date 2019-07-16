@@ -3,7 +3,7 @@ export const send = (
   target?: any,
 ): Promise<void> =>
   new Promise((resolve, reject) => {
-    const coreMessage = {
+    const coreMessage: CoreMessage = {
       async: false,
       target: target || null,
       payload: message,
@@ -29,7 +29,7 @@ export const sendAsync = (
   target?: any,
 ): Promise<any> =>
   new Promise((resolve, reject) => {
-    const coreMessage = {
+    const coreMessage: CoreMessage = {
       async: true,
       target: target || null,
       payload: message,
