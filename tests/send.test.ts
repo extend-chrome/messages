@@ -3,7 +3,7 @@ import { messages } from '../src/index'
 import chrome from 'sinon-chrome'
 import assert from 'power-assert'
 
-let lastError: any
+let lastError: { message: string } | undefined
 const lastErrorSpy = jest.fn(() => lastError)
 Object.defineProperty(chrome.runtime, 'lastError', {
   get: lastErrorSpy,
@@ -15,8 +15,18 @@ afterEach(() => {
 })
 
 describe('messages.send', () => {
+  test('creates one-way message', () => {
+    const message: MessagePayload = { greeting: 'hello' }
+
+    messages.send(message)
+
+    expect(
+      chrome.runtime.sendMessage.firstCall.args[0],
+    ).toMatchObject({ async: false })
+  })
+
   test('creates general message if no target given', () => {
-    const message = { greeting: 'hello' }
+    const message: MessagePayload = { greeting: 'hello' }
 
     messages.send(message)
 
@@ -26,7 +36,7 @@ describe('messages.send', () => {
   })
 
   test('calls runtime.sendMessage if no target', () => {
-    const message = { greeting: 'hello' }
+    const message: MessagePayload = { greeting: 'hello' }
 
     messages.send(message)
 
@@ -37,8 +47,8 @@ describe('messages.send', () => {
   })
 
   test('creates targeted message if target given', () => {
-    const message = { greeting: 'hello' }
-    const target = 'background'
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 'background'
 
     messages.send(message, target)
 
@@ -48,26 +58,32 @@ describe('messages.send', () => {
   })
 
   test('calls runtime.sendMessage if target is string', () => {
-    const message = { greeting: 'hello' }
-    const target = 'background'
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 'background'
 
     messages.send(message, target)
 
-    assert(chrome.runtime.sendMessage.called)
+    assert(
+      chrome.runtime.sendMessage.called,
+      'runtime.sendMessage was not called',
+    )
   })
 
   test('calls tabs.sendMessage if target is number', () => {
-    const message = { greeting: 'hello' }
-    const target = 1234
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 1234
 
     messages.send(message, target)
 
-    assert(chrome.tabs.sendMessage.called)
+    assert(
+      chrome.tabs.sendMessage.called,
+      'tabs.sendMessage was not called',
+    )
   })
 
-  test('calls runtime.sendMessage with one-way coreMessage', () => {
-    const message = { greeting: 'hello' }
-    const target = 'background'
+  test('creates one-way coreMessage', () => {
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 'background'
 
     const coreMessage = {
       async: false,
@@ -82,34 +98,167 @@ describe('messages.send', () => {
     expect(firstCall.args[0]).toEqual(coreMessage)
   })
 
-  test('rejects if runtime.lastError', (done) => {
-    const message = { greeting: 'hello' }
-    const target = 'background'
+  test('rejects if runtime.lastError', async () => {
+    expect.assertions(2)
+
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 'background'
     lastError = { message: 'should not resolve' }
 
     const result = messages.send(message, target)
     chrome.runtime.sendMessage.invokeCallback()
 
-    result
-      .then(() => {
-        expect(lastErrorSpy).toBeCalled()
-        done.fail(lastErrorSpy())
-      })
-      .catch((error) => {
-        expect(lastErrorSpy).toBeCalled()
-        expect(error.message).toBe(lastError.message)
-        done()
-      })
+    try {
+      await result
+    } catch (error) {
+      expect(lastErrorSpy).toBeCalled()
+      expect(error.message).toBe(lastError.message)
+    }
   })
 })
 
 describe('messages.sendAsync', () => {
-  test.todo('creates async message')
-  test.todo('creates general message if no target')
-  test.todo('calls runtime.sendMessage if no target')
-  test.todo('creates targeted message if target')
-  test.todo('calls runtime.sendMessage if target is string')
-  test.todo('calls tabs.sendMessage if target is number')
-  test.todo('resolves with response')
-  test.todo('rejects if runtime.lastError')
+  test('creates async message', () => {
+    const message: MessagePayload = { greeting: 'hello' }
+
+    messages.sendAsync(message)
+
+    expect(
+      chrome.runtime.sendMessage.firstCall.args[0],
+    ).toMatchObject({ async: true })
+  })
+
+  test('creates general message if no target', () => {
+    const message: MessagePayload = { greeting: 'hello' }
+
+    messages.sendAsync(message)
+
+    expect(
+      chrome.runtime.sendMessage.firstCall.args[0],
+    ).toMatchObject({ target: null })
+  })
+
+  test('calls runtime.sendMessage if no target', () => {
+    const message: MessagePayload = { greeting: 'hello' }
+
+    messages.sendAsync(message)
+
+    assert(
+      chrome.runtime.sendMessage.called,
+      'runtime.sendMessage was not called',
+    )
+  })
+
+  test('creates targeted message if target', () => {
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 'background'
+
+    messages.sendAsync(message, target)
+
+    expect(
+      chrome.runtime.sendMessage.firstCall.args[0],
+    ).toMatchObject({ target })
+  })
+
+  test('calls runtime.sendMessage if target is string', () => {
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 'background'
+
+    messages.send(message, target)
+
+    assert(
+      chrome.runtime.sendMessage.called,
+      'runtime.sendMessage was not called',
+    )
+  })
+
+  test('calls tabs.sendMessage if target is number', () => {
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 1234
+
+    messages.sendAsync(message, target)
+
+    assert(
+      chrome.tabs.sendMessage.called,
+      'tabs.sendMessage was not called',
+    )
+  })
+
+  test('creates async coreMessage', () => {
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 'background'
+
+    const coreMessage = {
+      async: true,
+      target,
+      payload: message,
+    }
+
+    messages.sendAsync(message, target)
+
+    const { firstCall } = chrome.runtime.sendMessage
+
+    expect(firstCall.args[0]).toEqual(coreMessage)
+  })
+
+  test('resolves with response', async () => {
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 'background'
+
+    const response: MessagePayload = { greeting: 'goodbye' }
+    const coreResponse: CoreResponse = {
+      payload: response,
+      success: true,
+    }
+
+    const promise = messages.sendAsync(message, target)
+    chrome.runtime.sendMessage.invokeCallback(coreResponse)
+
+    const result = await promise
+
+    expect(result).toEqual(response)
+  })
+
+  test('rejects if success === false', async () => {
+    expect.assertions(2)
+
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 'background'
+
+    const response: MessagePayload = {
+      greeting: 'should not resolve',
+    }
+    const coreResponse: CoreResponse = {
+      payload: { greeting: 'should not resolve' },
+      success: false,
+    }
+
+    const promise = messages.sendAsync(message, target)
+    chrome.runtime.sendMessage.invokeCallback(coreResponse)
+
+    try {
+      await promise
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error)
+      expect(error.message).toBe(response.greeting)
+    }
+  })
+
+  test('rejects if runtime.lastError', async () => {
+    expect.assertions(2)
+
+    const message: MessagePayload = { greeting: 'hello' }
+    const target: TargetName = 'background'
+    lastError = { message: 'should not resolve' }
+
+    const result = messages.send(message, target)
+    chrome.runtime.sendMessage.invokeCallback()
+
+    try {
+      await result
+    } catch (error) {
+      expect(lastErrorSpy).toBeCalled()
+      expect(error.message).toBe(lastError.message)
+    }
+  })
 })

@@ -1,11 +1,7 @@
-type Jsonifiable = string | number | boolean | null
-
-type JsonifiableData =
-  | Jsonifiable
-  | Array<Jsonifiable>
-  | {
-      [propName: string]: Jsonifiable
-    }
+interface MessagePayload {
+  greeting: string
+  [prop: string]: any
+}
 
 /**
  * Designate the extension script to receive the message.
@@ -27,27 +23,17 @@ type TargetName =
  * Must contain only JSON compatible data.
  */
 interface CoreMessage {
-  id: string
   target: TargetName
-  sender?: TargetName
-  payload: JsonifiableData
-}
-
-interface AsyncMessage extends CoreMessage {
-  sender: TargetName
+  payload: MessagePayload
 }
 
 /**
- * Private interface.
- *
  * Pass back to a script through a port.
  * Must contain only JSON compatible data.
  *
  * Must have the same message id as initial Message.
  */
 interface CoreResponse {
-  id: string
-  target: TargetName
-  payload: JsonifiableData
   success: boolean
+  payload: MessagePayload
 }

@@ -24,4 +24,30 @@ export const send = (
     }
   })
 
-export const sendAsync = () => {}
+export const sendAsync = (
+  message: any,
+  target?: any,
+): Promise<any> =>
+  new Promise((resolve, reject) => {
+    const coreMessage = {
+      async: true,
+      target: target || null,
+      payload: message,
+    }
+
+    const callback = (coreResponse: CoreResponse) => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(chrome.runtime.lastError.message))
+      } else if (coreResponse.success === false) {
+        reject(new Error(coreResponse.payload.greeting))
+      } else {
+        resolve(coreResponse.payload)
+      }
+    }
+
+    if (typeof target === 'number') {
+      chrome.tabs.sendMessage(target, coreMessage, callback)
+    } else {
+      chrome.runtime.sendMessage(coreMessage, callback)
+    }
+  })
