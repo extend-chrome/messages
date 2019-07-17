@@ -1,5 +1,5 @@
-import { messages } from '../src/index'
-import { _listeners } from '../src/events'
+import { messages } from '../../src/index'
+import { _listeners } from '../../src/events'
 
 import chrome from 'sinon-chrome'
 import assert from 'power-assert'

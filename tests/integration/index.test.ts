@@ -1,8 +1,8 @@
-import { onMessage, sendMessage } from '../src/index'
-import { asyncOn, on, _listeners, off } from '../src/events'
-import { asyncSend, send } from '../src/send'
+import { onMessage, sendMessage } from '../../src/index'
+import { asyncOn, on, _listeners, off } from '../../src/events'
+import { asyncSend, send } from '../../src/send'
 
-jest.mock('../src/events', () => {
+jest.mock('../../src/events', () => {
   const _size = jest.fn(() => 123)
 
   return {
@@ -18,7 +18,7 @@ jest.mock('../src/events', () => {
     },
   }
 })
-jest.mock('../src/send')
+jest.mock('../../src/send')
 
 describe('onMessage', () => {
   test('async addListener', () => {

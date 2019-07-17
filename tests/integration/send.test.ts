@@ -1,4 +1,4 @@
-import { messages } from '../src/index'
+import { messages } from '../../src/index'
 
 import chrome from 'sinon-chrome'
 import assert from 'power-assert'

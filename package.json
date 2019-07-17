@@ -13,13 +13,22 @@
   "scripts": {
     "build": "rollup -c",
     "start": "rollup -c -w",
-    "test": "jest",
-    "preversion": "npm run build",
+    "test": "jest --testPathIgnorePatterns=e2e",
+    "test:all": "jest",
+    "test:e2e": "jest e2e",
+    "preversion": "npm run test:all && npm run build",
     "postversion": "git push && npm publish"
   },
   "dependencies": {
     "@bumble/chrome-event": "^0.1.0",
-    "chrome-promise": "^3.0.5"
+    "@types/puppeteer": "^1.12.4",
+    "chrome-promise": "^3.0.5",
+    "puppeteer": "^1.18.1",
+    "rollup-plugin-chrome-extension": "^0.16.1",
+    "rollup-plugin-commonjs": "^10.0.1",
+    "rollup-plugin-empty-dir": "^0.1.1",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-zip": "^0.4.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.4.5",
