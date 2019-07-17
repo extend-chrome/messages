@@ -1,8 +1,8 @@
 import * as chrome from 'sinon-chrome'
+;(<any>window).chrome = chrome
 
 var ChromePromise = require('chrome-promise/constructor')
 var chromep = new ChromePromise({ chrome })
-;(<any>window).chrome = chrome
 ;(<any>window).chromep = chromep
 
 // Jest's jsdom does not include window.crypto

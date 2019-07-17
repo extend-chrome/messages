@@ -2,7 +2,6 @@ import path from 'path'
 import pptr, { Browser, Target, Page } from 'puppeteer'
 
 import * as tests from './extension-src/tests'
-jest.mock('./extension-src/tests')
 
 import { buildExtension } from './build-extension'
 const { options } = require('./extension-src/rollup.config')

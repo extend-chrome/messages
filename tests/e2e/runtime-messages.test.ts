@@ -2,10 +2,7 @@ import path from 'path'
 import pptr, { Browser, Target, Page } from 'puppeteer'
 
 import { buildExtension } from './build-extension'
-
 const { options } = require('./extension-src/rollup.config')
-const pathToExtension = path.join(__dirname, 'extension-build')
-options.output.dir = pathToExtension
 
 let browser: Browser
 let backgroundTarget: Target
@@ -13,9 +10,14 @@ let optionsTarget: Target
 let backgroundPage: Page
 let optionsPage: Page
 
+const pathToExtension = path.join(__dirname, 'extension-build')
+options.output.dir = pathToExtension
+
 beforeAll(async () => {
   await buildExtension(options)
+})
 
+beforeEach(async () => {
   browser = await pptr.launch({
     headless: false,
     args: [
@@ -36,7 +38,7 @@ beforeAll(async () => {
   optionsPage = await optionsTarget.page()
 })
 
-afterAll(async () => {
+afterEach(async () => {
   await browser.close()
 })
 
