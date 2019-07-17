@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "description": "An API for Chrome extension messages that makes sense.",
+  "bugs": {
+    "url": "https://github.com/bumble-org/messages/issues"
+  },
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/bumble-org/messages.git"
+  },
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
   "files": [
@@ -13,9 +20,9 @@
   "scripts": {
     "build": "rollup -c",
     "start": "rollup -c -w",
-    "test": "jest --testPathIgnorePatterns=e2e",
-    "test:all": "jest",
+    "test": "jest",
     "test:e2e": "jest e2e",
+    "test:general": "jest --testPathIgnorePatterns=e2e",
     "preversion": "npm run test:all && npm run build",
     "postversion": "git push && npm publish"
   },
