@@ -12,11 +12,11 @@ export const onMessage = {
       // W3C has deprecated sendResponse in favor of a promise
       sendResponse?: (response?: any) => void,
     ) => void,
-    { name, async }: { name?: string; async?: boolean } = {},
+    { target, async }: { target?: string; async?: boolean } = {},
   ) => {
     const _event = async ? asyncOn : on
 
-    _event(listener, name)
+    target ? _event(listener, target) : _event(listener)
   },
   removeListener: off,
   hasListeners: () => _listeners.size > 0,

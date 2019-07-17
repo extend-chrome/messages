@@ -43,7 +43,14 @@ interface MessageListener {
   (
     message: MessagePayload,
     sender: chrome.runtime.MessageSender,
-    sendResponse?: (response?: any) => void,
+  ): void
+}
+
+interface AsyncMessageListener {
+  (
+    message: MessagePayload,
+    sender: chrome.runtime.MessageSender,
+    sendResponse: (response?: any) => void,
   ): void
 }
 
@@ -54,7 +61,7 @@ interface CoreListener {
   ): void
 }
 
-interface AsyncListener {
+interface AsyncCoreListener {
   (
     coreMessage: CoreMessage,
     sender: chrome.runtime.MessageSender,

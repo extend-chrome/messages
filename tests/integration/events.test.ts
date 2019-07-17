@@ -100,23 +100,23 @@ describe('messages.on', () => {
     })
 
     test('receives messages for own target name', () => {
-      const name = 'background'
+      const target = 'background'
       const coreMessage: CoreMessage = {
         async: false,
         payload: message,
-        target: name,
+        target: target,
       }
 
       const listener = jest.fn()
 
-      messages.on(listener, name)
+      messages.on(listener, target)
       chrome.runtime.onMessage.trigger(coreMessage, sender)
 
       expect(listener).toBeCalled()
     })
 
     test('ignores messages for other targets', () => {
-      const name = 'background'
+      const target = 'background'
       const coreMessage: CoreMessage = {
         async: false,
         payload: message,
@@ -125,7 +125,7 @@ describe('messages.on', () => {
 
       const listener = jest.fn()
 
-      messages.on(listener, name)
+      messages.on(listener, target)
       chrome.runtime.onMessage.trigger(coreMessage, sender)
 
       expect(listener).not.toBeCalled()
@@ -177,7 +177,7 @@ describe('messages.asyncOn', () => {
     greeting: 'goodbye',
   }
 
-  const listener: MessageListener = (
+  const listener: AsyncMessageListener = (
     message,
     sender,
     sendResponse,
@@ -338,23 +338,23 @@ describe('messages.asyncOn', () => {
     })
 
     test('receives messages for own target name', () => {
-      const name = 'background'
+      const target = 'background'
       const coreMessage: CoreMessage = {
         async: true,
         payload: message,
-        target: name,
+        target: target,
       }
 
       const listener = jest.fn()
 
-      messages.asyncOn(listener, name)
+      messages.asyncOn(listener, target)
       chrome.runtime.onMessage.trigger(coreMessage, sender)
 
       expect(listener).toBeCalled()
     })
 
     test('ignores messages for other targets', () => {
-      const name = 'background'
+      const target = 'background'
       const coreMessage: CoreMessage = {
         async: true,
         payload: message,
@@ -363,7 +363,7 @@ describe('messages.asyncOn', () => {
 
       const listener = jest.fn()
 
-      messages.asyncOn(listener, name)
+      messages.asyncOn(listener, target)
       chrome.runtime.onMessage.trigger(coreMessage, sender)
 
       expect(listener).not.toBeCalled()

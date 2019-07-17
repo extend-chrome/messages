@@ -11,7 +11,15 @@ export const send = (
 
     const callback = () => {
       if (chrome.runtime.lastError) {
-        reject(new Error(chrome.runtime.lastError.message))
+        const lastError = chrome.runtime.lastError.message
+        const noResponse =
+          'The message port closed before a response was received'
+
+        if (lastError && lastError.includes(noResponse)) {
+          resolve()
+        } else {
+          reject({ message: lastError })
+        }
       } else {
         resolve()
       }
@@ -37,7 +45,7 @@ export const asyncSend = (
 
     const callback = (coreResponse: CoreResponse) => {
       if (chrome.runtime.lastError) {
-        reject(new Error(chrome.runtime.lastError.message))
+        reject(chrome.runtime.lastError)
       } else if (coreResponse.success === false) {
         reject(new Error(coreResponse.payload.greeting))
       } else {

@@ -1,5 +1,5 @@
-import { messages } from '../../../src/index'
+import * as tests from './tests.js'
 
-window.messages = messages
+window.tests = tests
 
 chrome.runtime.openOptionsPage()

@@ -1,6 +1,6 @@
 export const _listeners: Map<
-  MessageListener,
-  CoreListener | AsyncListener
+  MessageListener | AsyncMessageListener,
+  CoreListener | AsyncCoreListener
 > = new Map()
 
 export const on = (
@@ -23,15 +23,15 @@ export const on = (
 }
 
 export const asyncOn = (
-  listener: MessageListener,
-  name?: TargetName,
+  listener: AsyncMessageListener,
+  target?: TargetName,
 ) => {
-  const _listener: AsyncListener = (
-    { async, payload, target },
+  const _listener: AsyncCoreListener = (
+    { async, payload, target: _target },
     sender,
     sendResponse,
   ) => {
-    if (async && (!target || target === name)) {
+    if (async && (!_target || _target === target)) {
       (async () => {
         try {
           const respond = (response: MessagePayload): void => {
