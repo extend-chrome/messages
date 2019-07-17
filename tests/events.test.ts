@@ -163,7 +163,7 @@ describe('messages.on', () => {
   })
 })
 
-describe('messages.onAsync', () => {
+describe('messages.asyncOn', () => {
   const message: MessagePayload = {
     greeting: 'hello',
   }
@@ -198,7 +198,7 @@ describe('messages.onAsync', () => {
 
   describe('basic', () => {
     test('listens to runtime.onMessage', () => {
-      messages.onAsync(listenerSpy)
+      messages.asyncOn(listenerSpy)
       assert(chrome.runtime.onMessage.addListener.called)
       expect(listenerSpy).not.toBeCalled()
 
@@ -207,13 +207,13 @@ describe('messages.onAsync', () => {
     })
 
     test('adds listener to _listeners Map', () => {
-      messages.onAsync(listenerSpy)
+      messages.asyncOn(listenerSpy)
 
       expect(_listeners.has(listenerSpy)).toBe(true)
     })
 
     test('internal listener returns true', () => {
-      messages.onAsync(listenerSpy)
+      messages.asyncOn(listenerSpy)
 
       const _listener = _listeners.get(listenerSpy)
 
@@ -226,7 +226,7 @@ describe('messages.onAsync', () => {
     })
 
     test('listener receives CoreMessage payload', () => {
-      messages.onAsync(listenerSpy)
+      messages.asyncOn(listenerSpy)
       triggerOnMessage()
 
       expect(listenerSpy).toBeCalledWith(
@@ -239,7 +239,7 @@ describe('messages.onAsync', () => {
 
   describe('sendResponse', () => {
     test('respond calls sendResponse from runtime.onMessage', () => {
-      messages.onAsync(listenerSpy)
+      messages.asyncOn(listenerSpy)
       chrome.runtime.onMessage.trigger(
         coreMessage,
         sender,
@@ -250,7 +250,7 @@ describe('messages.onAsync', () => {
     })
 
     test('respond calls sendResponse with a CoreResponse', () => {
-      messages.onAsync(listenerSpy)
+      messages.asyncOn(listenerSpy)
       chrome.runtime.onMessage.trigger(
         coreMessage,
         sender,
@@ -276,7 +276,7 @@ describe('messages.onAsync', () => {
         payload: { greeting: message },
       }
 
-      messages.onAsync(listenerSpy)
+      messages.asyncOn(listenerSpy)
       chrome.runtime.onMessage.trigger(
         coreMessage,
         sender,
@@ -298,7 +298,7 @@ describe('messages.onAsync', () => {
         payload: { greeting: message },
       }
 
-      messages.onAsync(listenerSpy)
+      messages.asyncOn(listenerSpy)
       chrome.runtime.onMessage.trigger(
         coreMessage,
         sender,
@@ -316,7 +316,7 @@ describe('messages.onAsync', () => {
     test('receives async messages', () => {
       const listener = jest.fn()
 
-      messages.onAsync(listener)
+      messages.asyncOn(listener)
       chrome.runtime.onMessage.trigger(coreMessage, sender)
 
       expect(listener).toBeCalled()
@@ -331,7 +331,7 @@ describe('messages.onAsync', () => {
 
       const listener = jest.fn()
 
-      messages.onAsync(listener)
+      messages.asyncOn(listener)
       chrome.runtime.onMessage.trigger(oneWayMessage, sender)
 
       expect(listener).not.toBeCalled()
@@ -347,7 +347,7 @@ describe('messages.onAsync', () => {
 
       const listener = jest.fn()
 
-      messages.onAsync(listener, name)
+      messages.asyncOn(listener, name)
       chrome.runtime.onMessage.trigger(coreMessage, sender)
 
       expect(listener).toBeCalled()
@@ -363,7 +363,7 @@ describe('messages.onAsync', () => {
 
       const listener = jest.fn()
 
-      messages.onAsync(listener, name)
+      messages.asyncOn(listener, name)
       chrome.runtime.onMessage.trigger(coreMessage, sender)
 
       expect(listener).not.toBeCalled()
@@ -378,7 +378,7 @@ describe('messages.onAsync', () => {
 
       const listener = jest.fn()
 
-      messages.onAsync(listener)
+      messages.asyncOn(listener)
       chrome.runtime.onMessage.trigger(coreMessage, sender)
 
       expect(listener).toBeCalled()
@@ -393,7 +393,7 @@ describe('messages.onAsync', () => {
 
       const listener = jest.fn()
 
-      messages.onAsync(listener)
+      messages.asyncOn(listener)
       chrome.runtime.onMessage.trigger(coreMessage, sender)
 
       expect(listener).not.toBeCalled()
@@ -407,7 +407,7 @@ describe('messages.off', () => {
     const asyncListener = jest.fn()
 
     messages.on(listener)
-    messages.onAsync(asyncListener)
+    messages.asyncOn(asyncListener)
     messages.off(listener)
 
     assert(
@@ -422,12 +422,12 @@ describe('messages.off', () => {
     expect(_asyncListener).toBeDefined()
   })
 
-  test('removes messages.onAsync listener', () => {
+  test('removes messages.asyncOn listener', () => {
     const listener = jest.fn()
     const asyncListener = jest.fn()
 
     messages.on(listener)
-    messages.onAsync(asyncListener)
+    messages.asyncOn(asyncListener)
     messages.off(asyncListener)
 
     assert(

@@ -31,7 +31,7 @@ type SendMessage = (
 
 /**
  * Event listener for the corresponding message type
- * (`on` for `send`, `onAsync` for `sendAsync`).
+ * (`on` for `send`, `asyncOn` for `asyncSend`).
  *
  * `sendResponse` should always be called if it is defined to avoid a possible memory leak.
  *

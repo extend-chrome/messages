@@ -22,7 +22,7 @@ export const on = (
   _listeners.set(listener, _listener)
 }
 
-export const onAsync = (
+export const asyncOn = (
   listener: MessageListener,
   name?: TargetName,
 ) => {

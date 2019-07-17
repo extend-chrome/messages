@@ -117,11 +117,11 @@ describe('messages.send', () => {
   })
 })
 
-describe('messages.sendAsync', () => {
+describe('messages.asyncSend', () => {
   test('creates async message', () => {
     const message: MessagePayload = { greeting: 'hello' }
 
-    messages.sendAsync(message)
+    messages.asyncSend(message)
 
     expect(
       chrome.runtime.sendMessage.firstCall.args[0],
@@ -131,7 +131,7 @@ describe('messages.sendAsync', () => {
   test('creates general message if no target', () => {
     const message: MessagePayload = { greeting: 'hello' }
 
-    messages.sendAsync(message)
+    messages.asyncSend(message)
 
     expect(
       chrome.runtime.sendMessage.firstCall.args[0],
@@ -141,7 +141,7 @@ describe('messages.sendAsync', () => {
   test('calls runtime.sendMessage if no target', () => {
     const message: MessagePayload = { greeting: 'hello' }
 
-    messages.sendAsync(message)
+    messages.asyncSend(message)
 
     assert(
       chrome.runtime.sendMessage.called,
@@ -153,7 +153,7 @@ describe('messages.sendAsync', () => {
     const message: MessagePayload = { greeting: 'hello' }
     const target: TargetName = 'background'
 
-    messages.sendAsync(message, target)
+    messages.asyncSend(message, target)
 
     expect(
       chrome.runtime.sendMessage.firstCall.args[0],
@@ -176,7 +176,7 @@ describe('messages.sendAsync', () => {
     const message: MessagePayload = { greeting: 'hello' }
     const target: TargetName = 1234
 
-    messages.sendAsync(message, target)
+    messages.asyncSend(message, target)
 
     assert(
       chrome.tabs.sendMessage.called,
@@ -194,7 +194,7 @@ describe('messages.sendAsync', () => {
       payload: message,
     }
 
-    messages.sendAsync(message, target)
+    messages.asyncSend(message, target)
 
     const { firstCall } = chrome.runtime.sendMessage
 
@@ -211,7 +211,7 @@ describe('messages.sendAsync', () => {
       success: true,
     }
 
-    const promise = messages.sendAsync(message, target)
+    const promise = messages.asyncSend(message, target)
     chrome.runtime.sendMessage.invokeCallback(coreResponse)
 
     const result = await promise
@@ -233,7 +233,7 @@ describe('messages.sendAsync', () => {
       success: false,
     }
 
-    const promise = messages.sendAsync(message, target)
+    const promise = messages.asyncSend(message, target)
     chrome.runtime.sendMessage.invokeCallback(coreResponse)
 
     try {

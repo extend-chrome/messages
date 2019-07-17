@@ -1,6 +1,6 @@
 export const send = (
   message: any,
-  target?: any,
+  target?: string | number,
 ): Promise<void> =>
   new Promise((resolve, reject) => {
     const coreMessage: CoreMessage = {
@@ -24,9 +24,9 @@ export const send = (
     }
   })
 
-export const sendAsync = (
+export const asyncSend = (
   message: any,
-  target?: any,
+  target?: string | number,
 ): Promise<any> =>
   new Promise((resolve, reject) => {
     const coreMessage: CoreMessage = {
