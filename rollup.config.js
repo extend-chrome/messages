@@ -1,6 +1,5 @@
 /* eslint-env node */
 
-import bundle from 'rollup-plugin-bundle-imports'
 import typescript from 'rollup-plugin-typescript'
 
 export default [
@@ -18,7 +17,6 @@ export default [
         sourcemap: 'inline',
       },
     ],
-    external: ['rxjs'],
-    plugins: [typescript(), bundle()],
+    plugins: [typescript()],
   },
 ]

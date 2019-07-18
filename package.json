@@ -14,15 +14,16 @@
   "files": [
     "build"
   ],
-  "main": "build/bundle-cjs.js",
-  "module": "build/bundle-esm.js",
+  "main": "build/bumble-messages-cjs.js",
+  "module": "build/bumble-messages-esm.js",
   "scripts": {
     "build": "rollup -c",
     "start": "rollup -c -w",
     "test": "jest",
     "test:e2e": "jest e2e",
-    "test:general": "jest --testPathIgnorePatterns=e2e",
-    "preversion": "npm run test && npm run build",
+    "test:quick": "jest --testPathIgnorePatterns=e2e",
+    "test:all": "jest",
+    "preversion": "npm run build && npm run test:all",
     "postversion": "git push && npm publish"
   },
   "devDependencies": {
