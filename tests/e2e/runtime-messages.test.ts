@@ -1,7 +1,9 @@
 import path from 'path'
+import delay from 'delay'
+
 import pptr, { Browser, Target, Page } from 'puppeteer'
 
-import { buildExtension } from './build-extension'
+import { buildExtension } from './extension-setup'
 const { options } = require('./extension-src/rollup.config')
 
 let browser: Browser
@@ -18,6 +20,10 @@ beforeAll(async () => {
 })
 
 beforeEach(async () => {
+  await buildExtension(options)
+
+  await delay(500)
+
   browser = await pptr.launch({
     headless: false,
     args: [
@@ -30,11 +36,13 @@ beforeEach(async () => {
   backgroundTarget = await browser.waitForTarget(
     (t: Target) => t.type() === 'background_page',
   )
-  backgroundPage = await backgroundTarget.page()
-
   optionsTarget = await browser.waitForTarget((t: Target) =>
     t.url().endsWith('options.html'),
   )
+
+  await delay(500)
+
+  backgroundPage = await backgroundTarget.page()
   optionsPage = await optionsTarget.page()
 })
 
@@ -43,7 +51,7 @@ afterEach(async () => {
 })
 
 describe('chrome.runtime', () => {
-  test('sendMessage and onMessage', async () => {
+  test('basic messaging', async () => {
     const message = { greeting: 'message' }
     const response = { greeting: 'response' }
 
@@ -55,8 +63,21 @@ describe('chrome.runtime', () => {
     expect(results[0]).toEqual(message)
     expect(results[1]).toEqual(response)
   })
+
+  test.todo('multiple listeners, one response')
+  test.todo('multiple listeners, no response')
+  test.todo('multiple listeners, two responses')
 })
 
+describe('chrome.tabs', () => {
+  test.todo('basic messaging')
+
+  test.todo('multiple listeners, one response')
+  test.todo('multiple listeners, no response')
+  test.todo('multiple listeners, two responses')
+})
+
+// TODO: factor out into tests.ts
 function onMessage(response: any) {
   return new Promise((resolve) => {
     chrome.runtime.onMessage.addListener(
@@ -69,6 +90,7 @@ function onMessage(response: any) {
   })
 }
 
+// TODO: factor out into tests.ts
 function sendMessage(message: any) {
   return new Promise((resolve) => {
     chrome.runtime.sendMessage(message, (response) => {

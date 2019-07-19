@@ -58,13 +58,6 @@ interface CoreListener {
   (
     coreMessage: CoreMessage,
     sender: chrome.runtime.MessageSender,
-  ): void
-}
-
-interface AsyncCoreListener {
-  (
-    coreMessage: CoreMessage,
-    sender: chrome.runtime.MessageSender,
     sendResponse: (response?: any) => void,
   ): void
 }

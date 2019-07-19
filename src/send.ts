@@ -9,7 +9,7 @@ export const send = (
       payload: message,
     }
 
-    const callback = () => {
+    const callback = (response: CoreResponse) => {
       if (chrome.runtime.lastError) {
         const lastError = chrome.runtime.lastError.message
         const noResponse =
@@ -21,7 +21,11 @@ export const send = (
           reject({ message: lastError })
         }
       } else {
-        resolve()
+        if (response && !response.success) {
+          reject(response.payload)
+        } else {
+          resolve()
+        }
       }
     }
 
