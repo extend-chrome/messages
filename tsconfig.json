@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "module": "commonjs",
+    "module": "es2015",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "lib",
@@ -9,5 +9,5 @@
     "strict": true,
     "target": "es2017"
   },
-  "exclude": ["prototype"]
+  "exclude": ["prototype", "lib"]
 }

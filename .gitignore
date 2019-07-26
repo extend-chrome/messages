@@ -2,3 +2,4 @@ node_modules/
 build/
 .vscode/
 tests/e2e/extension-build
+.rpt2_cache
