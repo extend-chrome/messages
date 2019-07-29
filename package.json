@@ -7,11 +7,11 @@
   "files": [
     "lib/*.js",
     "lib/*.js.map",
-    "index.d.ts"
+    "lib/index.d.ts"
   ],
   "main": "lib/index-cjs.js",
   "module": "lib/index-esm.js",
-  "types": "index.d.ts",
+  "types": "lib/index.d.ts",
   "scripts": {
     "build": "run-p build:dev",
     "build:dev": "rollup -c --environment NODE_ENV:development",
@@ -19,7 +19,7 @@
     "build:types": "run-s build:types:compile build:types:move build:types:delete",
     "build:types:compile": "tsc -p tsconfig.d.json",
     "build:types:delete": "rm -rf types",
-    "build:types:move": "mv -u types/index.d.ts .",
+    "build:types:move": "mv -u types/index.d.ts lib",
     "build:watch": "npm run build:dev -- -w",
     "publish": "npm publish",
     "push": "git push",
