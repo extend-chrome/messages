@@ -1,6 +1,6 @@
 {
   "name": "@bumble/messages",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "An API for Chrome extension messages that makes sense.",
   "bugs": {
     "url": "https://github.com/bumble-org/messages/issues"
