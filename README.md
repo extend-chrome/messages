@@ -16,7 +16,7 @@ https://imgur.com/cKFLQ0o.png
 
 <div align="center">
 
-[![npm (scoped)](https://img.shields.io/npm/v/@bumble/messages.svg)](https://www.npmjs.com/package/${}/messages)
+[![npm (scoped)](https://img.shields.io/npm/v/@bumble/messages.svg)](https://www.npmjs.com/package/@bumble/messages)
 [![GitHub last commit](https://img.shields.io/github/last-commit/bumble-org/messages.svg)](https://github.com/bumble-org/messages)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 [![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
