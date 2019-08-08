@@ -10,7 +10,14 @@
     "noUnusedLocals": true,
     "sourceMap": true,
     "strict": true,
-    "target": "es2017"
+    "target": "es2017",
+    "lib": [
+      "es2017",
+      "dom",
+      "esnext.array"
+    ]
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

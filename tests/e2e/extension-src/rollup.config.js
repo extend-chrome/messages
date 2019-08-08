@@ -6,7 +6,6 @@ import chromeExtension from 'rollup-plugin-chrome-extension'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import emptyDir from 'rollup-plugin-empty-dir'
-import zip from 'rollup-plugin-zip'
 import typescript from 'rollup-plugin-typescript'
 
 const p = (x) => process.env.PRODUCTION && x
@@ -23,7 +22,6 @@ const plugins = [
   resolve(),
   commonjs(),
   emptyDir(),
-  p(zip({ dir: 'releases' })),
 ]
 
 export const options = {
