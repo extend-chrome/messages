@@ -15,21 +15,16 @@
   "scripts": {
     "build": "run-p build:dev",
     "build:dev": "rollup -c --environment NODE_ENV:development",
-    "build:production": "rollup -c --environment NODE_ENV:production",
-    "build:types": "run-s build:types:compile build:types:move build:types:delete",
-    "build:types:compile": "tsc -p tsconfig.d.json",
-    "build:types:delete": "rm -rf types",
-    "build:types:move": "mv -u types/index.d.ts lib",
+    "build:pro": "rollup -c --environment NODE_ENV:production",
+    "build:types": "tsc -p tsconfig.d.json",
     "build:watch": "npm run build:dev -- -w",
-    "publish": "npm publish",
-    "push": "git push",
+    "release": "git push && npm publish",
     "start": "run-p build:watch",
-    "test": "run-p test:quick",
+    "test": "jest",
     "test:all": "jest",
     "test:e2e": "jest e2e",
     "test:quick": "jest --testPathIgnorePatterns=e2e",
-    "preversion": "run-s build:production test:all",
-    "postversion": "run-s push publish"
+    "postversion": "run-s build:pro build:types release"
   },
   "devDependencies": {
     "@types/chrome": "0.0.81",
