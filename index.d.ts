@@ -1,4 +1,4 @@
 /**
  * Export anyFunction
  */
-export declare const anyFunction: () => void;
+export declare const anyFunction: () => void

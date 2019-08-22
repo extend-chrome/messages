@@ -11,13 +11,7 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
-    "lib": [
-      "es2017",
-      "dom",
-      "esnext.array"
-    ]
+    "lib": ["es2017", "dom", "esnext.array"]
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
