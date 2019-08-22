@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "module": "es2015",
     "moduleResolution": "node",
@@ -11,5 +12,5 @@
     "target": "es2017",
     "lib": ["es2017", "dom", "esnext.array"]
   },
-  "exclude": ["lib", "types"]
+  "exclude": ["lib"]
 }

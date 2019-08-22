@@ -7,11 +7,11 @@
   "files": [
     "lib/*.js",
     "lib/*.js.map",
-    "lib/index.d.ts"
+    "types/*.d.ts"
   ],
   "main": "lib/index-cjs.js",
   "module": "lib/index-esm.js",
-  "types": "lib/index.d.ts",
+  "types": "types/index.d.ts",
   "scripts": {
     "build": "run-p build:dev",
     "build:dev": "rollup -c --environment NODE_ENV:development",
