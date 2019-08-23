@@ -44,7 +44,7 @@ An API for Chrome extension messages that makes sense.
 
 You will need to use a bundler like [Rollup](https://rollupjs.org/guide/en/) or Webpack to include this library in the build of Chrome extension. 
 
-See [`rollup-plugin-chrome-extension`](https://github.com/@bumble/rollup-plugin-chrome-extension) for an easy way use Rollup to build your Chrome extension!
+See [`rollup-plugin-chrome-extension`](https://github.com/bumble-org/rollup-plugin-chrome-extension) for an easy way use Rollup to build your Chrome extension!
 
 ### Installation
 

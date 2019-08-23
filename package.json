@@ -13,11 +13,11 @@
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
   "files": [
     "lib",
-    "index.d.ts"
+    "types"
   ],
   "main": "lib/index-cjs.js",
   "module": "lib/index-esm.js",
-  "types": "index.d.ts",
+  "types": "types/index.d.ts",
   "scripts": {
     "build": "rollup -c",
     "start": "rollup -c -w",
