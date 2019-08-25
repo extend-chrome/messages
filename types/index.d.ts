@@ -17,13 +17,16 @@ export declare const onMessage: {
       async?: boolean | undefined
     },
   ) => void
-  removeListener: (listener: MessageListener) => void
+  removeListener: (
+    listener: import('./types').MessageListener,
+  ) => void
   hasListeners: () => boolean
   hasListener: (
-    key: MessageListener | AsyncMessageListener,
+    key:
+      | import('./types').MessageListener
+      | import('./types').AsyncMessageListener,
   ) => boolean
 }
-
 export declare const sendMessage: (
   message: {
     [prop: string]: any
@@ -37,19 +40,18 @@ export declare const sendMessage: (
     async?: boolean | undefined
   },
 ) => Promise<any>
-
 export declare const messages: {
   asyncOn: (
-    listener: AsyncMessageListener,
+    listener: import('./types').AsyncMessageListener,
     target?: string | number | undefined,
   ) => void
   asyncSend: (
     message: any,
     target?: string | number | undefined,
   ) => Promise<any>
-  off: (listener: MessageListener) => void
+  off: (listener: import('./types').MessageListener) => void
   on: (
-    listener: MessageListener,
+    listener: import('./types').MessageListener,
     target?: string | number | undefined,
   ) => void
   send: (

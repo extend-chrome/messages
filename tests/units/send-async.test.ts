@@ -1,6 +1,6 @@
 import { messages } from '../../src/index'
 
-import chrome from 'sinon-chrome'
+import * as chrome from 'sinon-chrome'
 import assert from 'power-assert'
 
 let lastError: { message: string } | undefined

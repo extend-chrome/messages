@@ -1,7 +1,7 @@
-import path from 'path'
+import * as path from 'path'
 import delay from 'delay'
 
-import pptr, { Browser, Target, Page } from 'puppeteer'
+import { Browser, Target, Page, launch } from 'puppeteer'
 
 import * as tests from './extension-src/tests'
 
@@ -22,7 +22,7 @@ beforeAll(async () => {
 
   await delay(500)
 
-  browser = await pptr.launch({
+  browser = await launch({
     headless: false,
     args: [
       '--disable-component-extensions-with-background-pages',

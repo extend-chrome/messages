@@ -2,7 +2,7 @@ import {
   messages,
   onMessage,
   sendMessage,
-} from '../lib/index-esm'
+} from '../lib/index.esm'
 
 test('build includes all exports', () => {
   expect(messages).toHaveProperty('send')

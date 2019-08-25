@@ -1,3 +1,5 @@
+import { CoreMessage, CoreResponse } from './types'
+
 export const send = (
   message: any,
   target?: string | number,

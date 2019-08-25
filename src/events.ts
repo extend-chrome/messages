@@ -1,3 +1,12 @@
+import {
+  MessageListener,
+  AsyncMessageListener,
+  CoreListener,
+  TargetName,
+  MessagePayload,
+  CoreResponse,
+} from './types'
+
 export const _listeners: Map<
   MessageListener | AsyncMessageListener,
   CoreListener

@@ -1,7 +1,7 @@
 import { messages } from '../../src/index'
 import { _listeners } from '../../src/events'
 
-import chrome from 'sinon-chrome'
+import * as chrome from 'sinon-chrome'
 import assert from 'power-assert'
 
 let lastError: { message: string } | undefined

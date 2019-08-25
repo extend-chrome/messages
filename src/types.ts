@@ -1,16 +1,16 @@
-/// <reference types="chrome" />
 /**
  * Designate the extension script to receive the message.
  *
  * Can be a default frame name ("background", "options", or "popup"),
  * a custom frame name, or a content script tab id.
  */
-export declare type TargetName =
+export type TargetName =
   | 'background'
   | 'popup'
   | 'options'
   | number
   | string
+
 /**
  * Private interface.
  *
@@ -22,10 +22,12 @@ export interface CoreMessage {
   target: TargetName | null
   payload: MessagePayload
 }
+
 export interface MessagePayload {
   greeting: string
   [prop: string]: any
 }
+
 /**
  * Pass back to a script through a port.
  * Must contain only JSON compatible data.
@@ -36,12 +38,14 @@ export interface CoreResponse {
   success: boolean
   payload: MessagePayload
 }
+
 export interface MessageListener {
   (
     message: MessagePayload,
     sender: chrome.runtime.MessageSender,
   ): void
 }
+
 export interface AsyncMessageListener {
   (
     message: MessagePayload,
@@ -49,6 +53,7 @@ export interface AsyncMessageListener {
     sendResponse: (response?: any) => void,
   ): void
 }
+
 export interface CoreListener {
   (
     coreMessage: CoreMessage,
