@@ -15,8 +15,8 @@
     "lib",
     "types"
   ],
-  "main": "lib/index-cjs.js",
-  "module": "lib/index-esm.js",
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.esm.js",
   "types": "types/index.d.ts",
   "scripts": {
     "build": "run-p build:dev",
