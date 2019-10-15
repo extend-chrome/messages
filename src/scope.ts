@@ -60,7 +60,7 @@ export function getScope(scope: string): MessagesScope {
 /**
  * A messages object that will send and receive messages only for that specfic scope name.
  */
-interface MessagesScope {
+export interface MessagesScope {
   /**
    * Send a message. Options are optional.
    *
