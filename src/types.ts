@@ -21,6 +21,7 @@ export interface CoreMessage {
   async: boolean
   target: TargetName | null
   payload: MessagePayload
+  scope: string
 }
 
 export interface MessagePayload {

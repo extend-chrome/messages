@@ -1,6 +1,6 @@
 import { CoreMessage, CoreResponse } from './types'
 
-export const send = (
+export const scopeSend = (scope: string) => (
   message: any,
   target?: string | number,
 ): Promise<void> =>
@@ -9,6 +9,7 @@ export const send = (
       async: false,
       target: target || null,
       payload: message,
+      scope,
     }
 
     const callback = (response: CoreResponse) => {
@@ -38,7 +39,7 @@ export const send = (
     }
   })
 
-export const asyncSend = (
+export const scopeAsyncSend = (scope: string) => (
   message: any,
   target?: string | number,
 ): Promise<any> =>
@@ -47,6 +48,7 @@ export const asyncSend = (
       async: true,
       target: target || null,
       payload: message,
+      scope,
     }
 
     const callback = (coreResponse: CoreResponse) => {

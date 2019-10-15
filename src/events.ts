@@ -1,23 +1,23 @@
 import {
-  MessageListener,
+  _getListener,
+  _removeListener,
+  _setListener,
+} from './ListenerMap'
+import {
   AsyncMessageListener,
   CoreListener,
-  TargetName,
-  MessagePayload,
   CoreResponse,
+  MessageListener,
+  MessagePayload,
+  TargetName,
 } from './types'
 
-export const _listeners: Map<
-  MessageListener | AsyncMessageListener,
-  CoreListener
-> = new Map()
-
-export const on = (
-  listener: MessageListener,
+export const scopeOn = (scope: string) => (
+  callback: MessageListener,
   target?: TargetName,
 ) => {
-  const _listener: CoreListener = (message, sender) => {
-    if (message.async) {
+  const listener: CoreListener = (message, sender) => {
+    if (message.async || message.scope !== scope) {
       return false
     }
 
@@ -27,7 +27,7 @@ export const on = (
       message.target === target // is correct target
     ) {
       try {
-        listener(message.payload, sender)
+        callback(message.payload, sender)
       } catch (error) {
         // Log listener error
         console.error(
@@ -40,21 +40,22 @@ export const on = (
     return false
   }
 
-  chrome.runtime.onMessage.addListener(_listener)
-  _listeners.set(listener, _listener)
+  chrome.runtime.onMessage.addListener(listener)
+  _setListener(scope, callback, listener)
 }
 
-export const asyncOn = (
-  listener: AsyncMessageListener,
+export const scopeAsyncOn = (scope: string) => (
+  callback: AsyncMessageListener,
   target?: TargetName,
 ) => {
-  const _listener: CoreListener = (
-    { async, payload, target: _target },
+  const listener: CoreListener = (
+    { async, payload, target: _target, scope: _scope },
     sender,
     sendResponse,
   ) => {
     if (
       async &&
+      scope === _scope &&
       (typeof _target === 'number' ||
         !_target ||
         _target === target)
@@ -70,7 +71,7 @@ export const asyncOn = (
             sendResponse(coreResponse)
           }
 
-          await listener(payload, sender, respond)
+          await callback(payload, sender, respond)
         } catch (error) {
           const response: CoreResponse = {
             success: false,
@@ -90,15 +91,17 @@ export const asyncOn = (
     return false
   }
 
-  chrome.runtime.onMessage.addListener(_listener)
-  _listeners.set(listener, _listener)
+  chrome.runtime.onMessage.addListener(listener)
+  _setListener(scope, callback, listener)
 }
 
-export const off = (listener: MessageListener) => {
-  const _listener = _listeners.get(listener)
+export const scopeOff = (scope: string) => (
+  listener: MessageListener,
+) => {
+  const _listener = _getListener(scope, listener)
 
   if (_listener) {
-    _listeners.delete(listener)
+    _removeListener(scope, listener)
     chrome.runtime.onMessage.removeListener(_listener)
   }
 }

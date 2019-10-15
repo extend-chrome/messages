@@ -1,8 +1,16 @@
-import { messages } from '../../src/index'
-import { _listeners } from '../../src/events'
+import { getScope } from '../../src/scope'
+
+import { _listeners, _getListener } from '../../src/ListenerMap'
 
 import * as chrome from 'sinon-chrome'
 import assert from 'power-assert'
+import {
+  AsyncMessageListener,
+  MessageListener,
+} from '../../src/types'
+
+const scope = 'test'
+const messages = getScope(scope)
 
 let lastError: { message: string } | undefined
 const lastErrorSpy = jest.fn(() => lastError)
@@ -19,11 +27,13 @@ afterEach(() => {
 })
 
 test('removes messages.on listener', () => {
-  const listener = jest.fn()
-  const asyncListener = jest.fn()
+  const listener = jest.fn() as MessageListener
+  const asyncListener = jest.fn(
+    (x, y, z) => {},
+  ) as AsyncMessageListener
 
   messages.on(listener)
-  messages.asyncOn(asyncListener)
+  messages.on(asyncListener)
   messages.off(listener)
 
   assert(
@@ -31,19 +41,21 @@ test('removes messages.on listener', () => {
     'chrome.runtime.onMessage.removeListener was not called',
   )
 
-  const _listener = _listeners.get(listener)
-  const _asyncListener = _listeners.get(asyncListener)
+  const _listener = _getListener(scope, listener)
+  const _asyncListener = _getListener(scope, asyncListener)
 
   expect(_listener).toBeUndefined()
   expect(_asyncListener).toBeDefined()
 })
 
 test('removes messages.asyncOn listener', () => {
-  const listener = jest.fn()
-  const asyncListener = jest.fn()
+  const listener = jest.fn() as MessageListener
+  const asyncListener = jest.fn(
+    (x, y, z) => {},
+  ) as AsyncMessageListener
 
   messages.on(listener)
-  messages.asyncOn(asyncListener)
+  messages.on(asyncListener)
   messages.off(asyncListener)
 
   assert(
@@ -51,8 +63,8 @@ test('removes messages.asyncOn listener', () => {
     'chrome.runtime.onMessage.removeListener was not called',
   )
 
-  const _listener = _listeners.get(listener)
-  const _asyncListener = _listeners.get(asyncListener)
+  const _listener = _getListener(scope, listener)
+  const _asyncListener = _getListener(scope, asyncListener)
 
   expect(_listener).toBeDefined()
   expect(_asyncListener).toBeUndefined()

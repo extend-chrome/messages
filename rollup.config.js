@@ -17,6 +17,7 @@ export default [
         sourcemap: true,
       },
     ],
+    external: ['rxjs'],
     plugins: [typescript()],
   },
 ]

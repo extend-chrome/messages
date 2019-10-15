@@ -1,44 +1,17 @@
-import { send, asyncSend } from './send'
-import { on, asyncOn, off, _listeners } from './events'
+import { getScope } from './scope'
 
-export const onMessage = {
-  addListener: (
-    listener: (
-      message: {
-        greeting: string
-        [prop: string]: any
-      },
-      sender: chrome.runtime.MessageSender,
-      // W3C has deprecated sendResponse in favor of a promise
-      sendResponse?: (response?: any) => void,
-    ) => void,
-    { target, async }: { target?: string; async?: boolean } = {},
-  ) => {
-    const _event = async ? asyncOn : on
+// TODO: add function getLine
+// - Get a sender and an Observable for a specific greeting
 
-    target ? _event(listener, target) : _event(listener)
-  },
-  removeListener: off,
-  hasListeners: () => _listeners.size > 0,
-  hasListener: _listeners.has,
-}
+// TODO: define a messages area
+// TODO: add a messages stream
+// TODO: add an async messages stream
 
-export const sendMessage = (
-  message: {
-    greeting: string
-    [prop: string]: any
-  },
-  { target, async }: { target?: string; async?: boolean } = {},
-) => {
-  const _send = async ? asyncSend : send
+// function getLine<T>(greeting: string): [(data: T) => Promise<void>, Observable<[T, Sender]>]
+// function getAsyncLine<T, R>(greeting: string): [(data: T) => Promise<R>, Observable<[T, Sender, (data: R) => void]>]
+// const messages: Scope = { send, on, off, asyncSend, asyncOn, stream, asyncStream, onMessage }
+// export { messages, getScope, getLine }
 
-  return _send(message, target)
-}
+export const messages = getScope('@bumble/messages__root')
 
-export const messages = {
-  asyncOn,
-  asyncSend,
-  off,
-  on,
-  send,
-}
+export { getScope }

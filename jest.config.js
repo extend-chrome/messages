@@ -7,4 +7,5 @@ module.exports = {
   transform: {
     '.(js|jsx)': '@sucrase/jest-plugin',
   },
+  testPathIgnorePatterns: ['/node_modules/', '/playground/'],
 }

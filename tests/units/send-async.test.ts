@@ -1,7 +1,16 @@
-import { messages } from '../../src/index'
+import { getScope } from '../../src/scope'
 
 import * as chrome from 'sinon-chrome'
 import assert from 'power-assert'
+import {
+  MessagePayload,
+  TargetName,
+  CoreMessage,
+  CoreResponse,
+} from '../../src/types'
+
+const scope = 'test'
+const messages = getScope(scope)
 
 let lastError: { message: string } | undefined
 const lastErrorSpy = jest.fn(() => lastError)
@@ -17,7 +26,7 @@ afterEach(() => {
 test('creates async message', () => {
   const message: MessagePayload = { greeting: 'hello' }
 
-  messages.asyncSend(message)
+  messages.send(message, { async: true })
 
   expect(
     chrome.runtime.sendMessage.firstCall.args[0],
@@ -27,7 +36,7 @@ test('creates async message', () => {
 test('creates general message if no target', () => {
   const message: MessagePayload = { greeting: 'hello' }
 
-  messages.asyncSend(message)
+  messages.send(message, { async: true })
 
   expect(
     chrome.runtime.sendMessage.firstCall.args[0],
@@ -37,7 +46,7 @@ test('creates general message if no target', () => {
 test('calls runtime.sendMessage if no target', () => {
   const message: MessagePayload = { greeting: 'hello' }
 
-  messages.asyncSend(message)
+  messages.send(message, { async: true })
 
   assert(
     chrome.runtime.sendMessage.called,
@@ -49,7 +58,7 @@ test('creates targeted message if target', () => {
   const message: MessagePayload = { greeting: 'hello' }
   const target: TargetName = 'background'
 
-  messages.asyncSend(message, target)
+  messages.send(message, { target, async: true })
 
   expect(
     chrome.runtime.sendMessage.firstCall.args[0],
@@ -60,7 +69,7 @@ test('calls runtime.sendMessage if target is string', () => {
   const message: MessagePayload = { greeting: 'hello' }
   const target: TargetName = 'background'
 
-  messages.send(message, target)
+  messages.send(message, { target, async: true })
 
   assert(
     chrome.runtime.sendMessage.called,
@@ -72,7 +81,7 @@ test('calls tabs.sendMessage if target is number', () => {
   const message: MessagePayload = { greeting: 'hello' }
   const target: TargetName = 1234
 
-  messages.asyncSend(message, target)
+  messages.send(message, { target, async: true })
 
   assert(
     chrome.tabs.sendMessage.called,
@@ -88,13 +97,36 @@ test('creates async coreMessage', () => {
     async: true,
     target,
     payload: message,
+    scope,
   }
 
-  messages.asyncSend(message, target)
+  messages.send(message, { target, async: true })
 
   const { firstCall } = chrome.runtime.sendMessage
+  const [result] = firstCall.args
 
-  expect(firstCall.args[0]).toEqual(coreMessage)
+  expect(result.async).toBe(true)
+  expect(result).toEqual(coreMessage)
+})
+
+test('creates scoped coreMessage', () => {
+  const message: MessagePayload = { greeting: 'hello' }
+  const target: TargetName = 'background'
+
+  const coreMessage: CoreMessage = {
+    async: true,
+    target,
+    payload: message,
+    scope,
+  }
+
+  messages.send(message, { target, async: true })
+
+  const { firstCall } = chrome.runtime.sendMessage
+  const [result] = firstCall.args
+
+  expect(result.scope).toBe(scope)
+  expect(result).toEqual(coreMessage)
 })
 
 test('resolves with response', async () => {
@@ -107,7 +139,7 @@ test('resolves with response', async () => {
     success: true,
   }
 
-  const promise = messages.asyncSend(message, target)
+  const promise = messages.send(message, { target, async: true })
   chrome.runtime.sendMessage.invokeCallback(coreResponse)
 
   const result = await promise
@@ -129,7 +161,7 @@ test('rejects if success === false', async () => {
     success: false,
   }
 
-  const promise = messages.asyncSend(message, target)
+  const promise = messages.send(message, { target, async: true })
   chrome.runtime.sendMessage.invokeCallback(coreResponse)
 
   try {
@@ -147,7 +179,7 @@ test('rejects if runtime.lastError', async () => {
   const target: TargetName = 'background'
   lastError = { message: 'should not resolve' }
 
-  const result = messages.send(message, target)
+  const result = messages.send(message, { target, async: true })
   chrome.runtime.sendMessage.invokeCallback()
 
   try {
