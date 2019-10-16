@@ -12,5 +12,5 @@
     "target": "es2017",
     "lib": ["es2017", "dom", "esnext.array"]
   },
-  "exclude": ["lib", "playground"]
+  "exclude": ["lib", "playground", "types"]
 }
