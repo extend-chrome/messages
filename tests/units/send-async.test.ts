@@ -1,16 +1,15 @@
-import { getScope } from '../../src/scope'
+import { useScope } from '../../src/scope'
 
 import * as chrome from 'sinon-chrome'
 import assert from 'power-assert'
 import {
-  MessagePayload,
   TargetName,
   CoreMessage,
   CoreResponse,
 } from '../../src/types'
 
 const scope = 'test'
-const messages = getScope(scope)
+const messages = useScope(scope)
 
 let lastError: { message: string } | undefined
 const lastErrorSpy = jest.fn(() => lastError)
@@ -24,7 +23,7 @@ afterEach(() => {
 })
 
 test('creates async message', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
 
   messages.send(message, { async: true })
 
@@ -34,7 +33,7 @@ test('creates async message', () => {
 })
 
 test('creates general message if no target', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
 
   messages.send(message, { async: true })
 
@@ -44,7 +43,7 @@ test('creates general message if no target', () => {
 })
 
 test('calls runtime.sendMessage if no target', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
 
   messages.send(message, { async: true })
 
@@ -55,7 +54,7 @@ test('calls runtime.sendMessage if no target', () => {
 })
 
 test('creates targeted message if target', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 'background'
 
   messages.send(message, { target, async: true })
@@ -66,7 +65,7 @@ test('creates targeted message if target', () => {
 })
 
 test('calls runtime.sendMessage if target is string', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 'background'
 
   messages.send(message, { target, async: true })
@@ -78,7 +77,7 @@ test('calls runtime.sendMessage if target is string', () => {
 })
 
 test('calls tabs.sendMessage if target is number', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 1234
 
   messages.send(message, { target, async: true })
@@ -90,7 +89,7 @@ test('calls tabs.sendMessage if target is number', () => {
 })
 
 test('creates async coreMessage', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 'background'
 
   const coreMessage: CoreMessage = {
@@ -110,7 +109,7 @@ test('creates async coreMessage', () => {
 })
 
 test('creates scoped coreMessage', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 'background'
 
   const coreMessage: CoreMessage = {
@@ -130,10 +129,10 @@ test('creates scoped coreMessage', () => {
 })
 
 test('resolves with response', async () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 'background'
 
-  const response: MessagePayload = { greeting: 'goodbye' }
+  const response = { greeting: 'goodbye' }
   const coreResponse: CoreResponse = {
     payload: response,
     success: true,
@@ -150,10 +149,10 @@ test('resolves with response', async () => {
 test('rejects if success === false', async () => {
   expect.assertions(2)
 
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 'background'
 
-  const response: MessagePayload = {
+  const response = {
     greeting: 'should not resolve',
   }
   const coreResponse: CoreResponse = {
@@ -175,7 +174,7 @@ test('rejects if success === false', async () => {
 test('rejects if runtime.lastError', async () => {
   expect.assertions(2)
 
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 'background'
   lastError = { message: 'should not resolve' }
 

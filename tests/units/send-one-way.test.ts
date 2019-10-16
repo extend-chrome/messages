@@ -1,15 +1,11 @@
 import * as chrome from 'sinon-chrome'
 import assert from 'power-assert'
-import {
-  MessagePayload,
-  TargetName,
-  CoreMessage,
-} from '../../src/types'
+import { TargetName, CoreMessage } from '../../src/types'
 
-import { getScope } from '../../src/scope'
+import { useScope } from '../../src/scope'
 
 const scope = 'test'
-const messages = getScope(scope)
+const messages = useScope(scope)
 
 let lastError: { message: string } | undefined
 const lastErrorSpy = jest.fn(() => lastError)
@@ -23,7 +19,7 @@ afterEach(() => {
 })
 
 test('creates one-way message', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
 
   messages.send(message)
 
@@ -33,7 +29,7 @@ test('creates one-way message', () => {
 })
 
 test('creates general message if no target given', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
 
   messages.send(message)
 
@@ -43,7 +39,7 @@ test('creates general message if no target given', () => {
 })
 
 test('calls runtime.sendMessage if no target', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
 
   messages.send(message)
 
@@ -54,7 +50,7 @@ test('calls runtime.sendMessage if no target', () => {
 })
 
 test('creates targeted message if target given', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 'background'
 
   messages.send(message, { target })
@@ -65,7 +61,7 @@ test('creates targeted message if target given', () => {
 })
 
 test('calls runtime.sendMessage if target is string', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 'background'
 
   messages.send(message, { target })
@@ -77,7 +73,7 @@ test('calls runtime.sendMessage if target is string', () => {
 })
 
 test('calls tabs.sendMessage if target is number', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 1234
 
   messages.send(message, { target })
@@ -89,7 +85,7 @@ test('calls tabs.sendMessage if target is number', () => {
 })
 
 test('creates one-way coreMessage', () => {
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 'background'
 
   const coreMessage: CoreMessage = {
@@ -109,7 +105,7 @@ test('creates one-way coreMessage', () => {
 test('rejects if runtime.lastError', async () => {
   expect.assertions(2)
 
-  const message: MessagePayload = { greeting: 'hello' }
+  const message = { greeting: 'hello' }
   const target: TargetName = 'background'
   lastError = { message: 'should not resolve' }
 

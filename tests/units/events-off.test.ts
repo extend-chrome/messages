@@ -1,4 +1,4 @@
-import { getScope } from '../../src/scope'
+import { useScope } from '../../src/scope'
 
 import { _listeners, _getListener } from '../../src/ListenerMap'
 
@@ -10,7 +10,7 @@ import {
 } from '../../src/types'
 
 const scope = 'test'
-const messages = getScope(scope)
+const messages = useScope(scope)
 
 let lastError: { message: string } | undefined
 const lastErrorSpy = jest.fn(() => lastError)

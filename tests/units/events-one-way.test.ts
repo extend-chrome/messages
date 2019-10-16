@@ -2,16 +2,12 @@ import { _listeners, _getListener } from '../../src/ListenerMap'
 
 import * as chrome from 'sinon-chrome'
 import assert from 'power-assert'
-import {
-  MessagePayload,
-  CoreMessage,
-  MessageListener,
-} from '../../src/types'
+import { CoreMessage, MessageListener } from '../../src/types'
 
-import { getScope } from '../../src/scope'
+import { useScope } from '../../src/scope'
 
 const scope = 'test'
-const messages = getScope(scope)
+const messages = useScope(scope)
 
 let lastError: { message: string } | undefined
 const lastErrorSpy = jest.fn(() => lastError)
@@ -27,7 +23,7 @@ afterEach(() => {
   _listeners.clear()
 })
 
-const message: MessagePayload = {
+const message = {
   greeting: 'hello',
 }
 const coreMessage: CoreMessage = {

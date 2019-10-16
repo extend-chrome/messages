@@ -1,4 +1,4 @@
-import { getScope } from '../../src/scope'
+import { useScope } from '../../src/scope'
 
 import { _listeners, _getListener } from '../../src/ListenerMap'
 
@@ -6,14 +6,13 @@ import * as chrome from 'sinon-chrome'
 import assert from 'power-assert'
 import delay from 'delay'
 import {
-  MessagePayload,
   CoreMessage,
   AsyncMessageListener,
   CoreResponse,
 } from '../../src/types'
 
 const scope = 'test'
-const messages = getScope(scope)
+const messages = useScope(scope)
 
 let lastError: { message: string } | undefined
 const lastErrorSpy = jest.fn(() => lastError)
@@ -29,7 +28,7 @@ afterEach(() => {
   _listeners.clear()
 })
 
-const message: MessagePayload = {
+const message = {
   greeting: 'hello',
 }
 const coreMessage: CoreMessage = {
@@ -39,7 +38,7 @@ const coreMessage: CoreMessage = {
   scope,
 }
 const sender = {} // Not used directly by @bumble/messages
-const response: MessagePayload = {
+const response = {
   greeting: 'goodbye',
 }
 
@@ -83,8 +82,12 @@ test('internal listener returns true', () => {
 
   expect(_listener).toBeDefined()
   expect(_listener).toBeInstanceOf(Function)
-  // @ts-ignore
-  expect(_listener(coreMessage, sender, sendResponse)).toBe(true)
+
+  if (_listener) {
+    expect(_listener(coreMessage, sender, sendResponse)).toBe(
+      true,
+    )
+  }
 })
 
 test('listener receives CoreMessage payload', () => {

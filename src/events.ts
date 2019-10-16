@@ -8,7 +8,6 @@ import {
   CoreListener,
   CoreResponse,
   MessageListener,
-  MessagePayload,
   TargetName,
 } from './types'
 
@@ -62,7 +61,7 @@ export const scopeAsyncOn = (scope: string) => (
     ) {
       ;(async () => {
         try {
-          const respond = (response: MessagePayload): void => {
+          const respond = (response: any): void => {
             const coreResponse: CoreResponse = {
               success: true,
               payload: response,
@@ -96,7 +95,7 @@ export const scopeAsyncOn = (scope: string) => (
 }
 
 export const scopeOff = (scope: string) => (
-  listener: MessageListener,
+  listener: MessageListener | AsyncMessageListener,
 ) => {
   const _listener = _getListener(scope, listener)
 

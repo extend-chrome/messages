@@ -20,13 +20,13 @@ export type TargetName =
 export interface CoreMessage {
   async: boolean
   target: TargetName | null
-  payload: MessagePayload
+  payload: any
   scope: string
 }
 
-export interface MessagePayload {
+export interface TypedMessage<T> {
   greeting: string
-  [prop: string]: any
+  data: T
 }
 
 /**
@@ -37,19 +37,16 @@ export interface MessagePayload {
  */
 export interface CoreResponse {
   success: boolean
-  payload: MessagePayload
+  payload: any
 }
 
 export interface MessageListener {
-  (
-    message: MessagePayload,
-    sender: chrome.runtime.MessageSender,
-  ): void
+  (message: any, sender: chrome.runtime.MessageSender): void
 }
 
 export interface AsyncMessageListener {
   (
-    message: MessagePayload,
+    message: any,
     sender: chrome.runtime.MessageSender,
     sendResponse: (response?: any) => void,
   ): void

@@ -1,23 +1,47 @@
 import { fromEventPattern, merge, Observable } from 'rxjs'
+import { filter, map } from 'rxjs/operators'
 import { scopeAsyncOn, scopeOff, scopeOn } from './events'
 import { scopeAsyncSend, scopeSend } from './send'
 import { AsyncMessageListener, MessageListener } from './types'
 
+/** The tab that sent the message */
+type Sender = chrome.runtime.MessageSender
+
 /**
  * Get a messages scope by name.
  */
-export function getScope(scope: string): MessagesScope {
+export function useScope(scope: string) {
   const _asyncOn = scopeAsyncOn(scope)
   const _asyncSend = scopeAsyncSend(scope)
   const _off = scopeOff(scope)
   const _on = scopeOn(scope)
   const _send = scopeSend(scope)
 
+  /**
+   * Send a message. Options are optional.
+   *
+   * @param [options.async] Set to true to receive a response.
+   * @param [options.target] Either a tab id or a target name. Use to send to a tab or a specific listener.
+   */
+  function send<T, R>(
+    data: T,
+    options: {
+      target?: number | string
+      async: true
+    },
+  ): Promise<R>
+  function send<T>(
+    data: T,
+    options: {
+      target?: number | string
+    },
+  ): Promise<void>
+  function send<T>(data: T): Promise<void>
   async function send<T, R>(
     data: T,
     options?: {
       target?: number | string
-      async?: boolean
+      async?: true
     },
   ) {
     const { async = false, target } = options || {}
@@ -29,6 +53,23 @@ export function getScope(scope: string): MessagesScope {
     }
   }
 
+  /** Listen for messages. */
+  function on<T, R>(
+    callback: (
+      data: T,
+      sender: Sender,
+      respond: (data: R) => void,
+    ) => void,
+    target?: string,
+  ): void
+  function on<T>(
+    callback: (data: T, sender: Sender) => void,
+    target?: string,
+  ): void
+  function on<T>(
+    callback: (data: T) => void,
+    target?: string,
+  ): void
   function on(
     callback: MessageListener | AsyncMessageListener,
     target?: string | number,
@@ -46,6 +87,14 @@ export function getScope(scope: string): MessagesScope {
     }
   }
 
+  /** Remove a message listener from `on`. */
+  function off(
+    fn: MessageListener | AsyncMessageListener,
+  ): void {
+    return _off(fn)
+  }
+
+  /** Untyped Observable of all messages in scope */
   const stream = merge(
     fromEventPattern<[any, Sender]>(_on, _off),
     fromEventPattern<[any, Sender, ((data: any) => void)]>(
@@ -54,62 +103,109 @@ export function getScope(scope: string): MessagesScope {
     ),
   )
 
-  return { send, on, off: _off, stream }
-}
+  const _greetings = new Set()
 
-/**
- * A messages object that will send and receive messages only for that specfic scope name.
- */
-export interface MessagesScope {
   /**
-   * Send a message. Options are optional.
+   * Get a paired send function and message Observable.
    *
-   * @param [options.async] Set to true to receive a response.
-   * @param [options.target] Either a tab id or a target name. Use to send to a tab or a specific listener.
+   * @param greeting Unique id for message
+   * @param options.async Set true to send a response from the Observable
    */
-  send<T, R>(
-    data: T,
-    options: {
-      target?: number | string
-      async: boolean
-    },
-  ): Promise<R>
-  send<T>(
-    data: T,
-    options: {
-      target: number | string
-    },
-  ): Promise<void>
-  send<T>(data: T): Promise<void>
-
-  /** Listen for messages. */
-  on<T, R>(
-    callback: (
+  function useLine<T, R>(
+    greeting: string,
+    options: { async: true },
+  ): [
+    (
       data: T,
-      sender: Sender,
-      respond: (data: R) => void,
-    ) => void,
-    target?: string,
-  ): void
-  on<T>(
-    callback: (data: T, sender: Sender) => void,
-    target?: string,
-  ): void
-  on<T>(callback: (data: T) => void, target?: string): void
+      options?: {
+        target: string | number
+      },
+    ) => Promise<R>,
+    Observable<[T, Sender, ((response: R) => void)]>,
+  ]
+  function useLine<T>(
+    greeting: string,
+  ): [
+    (
+      data: T,
+      options?: {
+        target: string | number
+      },
+    ) => Promise<void>,
+    Observable<[T, Sender]>,
+  ]
+  function useLine<T, R>(
+    greeting: string,
+    options?: { async: true },
+  ) {
+    if (_greetings.has(greeting))
+      throw new Error('greeting is not unique')
 
-  /** Remove a message listener from `on`. */
-  off(fn: MessageListener | AsyncMessageListener): void
+    _greetings.add(greeting)
 
-  /**
-   * Observable of messages.
-   *
-   * A tuple of data, the message sender, and an optional response function.
-   * If the response function is present, it must be called at some point.
-   */
-  readonly stream: Observable<
-    [any, Sender] | [any, Sender, ((data: any) => void)]
-  >
+    const { async } = options || {}
+
+    const _send = (
+      data: T,
+      _options?: { target: number | string },
+    ) => {
+      interface LineMessage {
+        greeting: string
+        data: T
+      }
+
+      const { target } = _options || {}
+
+      if (async) {
+        return send<LineMessage, R>(
+          { greeting, data },
+          {
+            async,
+            target,
+          },
+        )
+      } else {
+        return send<LineMessage>({ greeting, data }, { target })
+      }
+    }
+
+    if (async) {
+      const _stream: Observable<
+        [T, Sender, ((response: R) => void)]
+      > = stream.pipe(
+        // Filter line messages
+        filter((x) => {
+          return x[0].greeting === greeting
+        }),
+        // Map message to data
+        map(([{ data }, s, r]) => [data, s, r]),
+        filter(
+          (x): x is [T, Sender, ((response: R) => void)] =>
+            x.length === 3,
+        ),
+      )
+
+      return [_send, _stream]
+    } else {
+      const _stream: Observable<[T, Sender]> = stream.pipe(
+        // Filter line messages
+        filter((x) => {
+          return x[0].greeting === greeting
+        }),
+        // Map message to data
+        map(([{ data }, s]) => [data, s]),
+        filter((x): x is [T, Sender] => x.length < 3),
+      )
+
+      return [_send, _stream]
+    }
+  }
+
+  return {
+    send,
+    on,
+    off,
+    stream,
+    useLine,
+  }
 }
-
-/** The tab that sent the message */
-type Sender = chrome.runtime.MessageSender
