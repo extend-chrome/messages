@@ -128,6 +128,72 @@ test('ignores wrong message', (done) => {
   }, 500)
 })
 
+test('ignores primitive message', (done) => {
+  expect.assertions(0)
+
+  const sender = { id: 123 }
+  const message: CoreMessage = {
+    async: false,
+    scope: scope,
+    target: null,
+    payload: 123,
+  }
+
+  stream.subscribe(() => {
+    done.fail()
+  })
+
+  chrome.runtime.onMessage.trigger(message, sender)
+
+  setTimeout(() => {
+    done()
+  }, 500)
+})
+
+test('ignores null message', (done) => {
+  expect.assertions(0)
+
+  const sender = { id: 123 }
+  const message: CoreMessage = {
+    async: false,
+    scope: scope,
+    target: null,
+    payload: null,
+  }
+
+  stream.subscribe(() => {
+    done.fail()
+  })
+
+  chrome.runtime.onMessage.trigger(message, sender)
+
+  setTimeout(() => {
+    done()
+  }, 500)
+})
+
+test('ignores undefined message', (done) => {
+  expect.assertions(0)
+
+  const sender = { id: 123 }
+  const message: CoreMessage = {
+    async: false,
+    scope: scope,
+    target: null,
+    payload: undefined,
+  }
+
+  stream.subscribe(() => {
+    done.fail()
+  })
+
+  chrome.runtime.onMessage.trigger(message, sender)
+
+  setTimeout(() => {
+    done()
+  }, 500)
+})
+
 test('respond function calls native respond', (done) => {
   expect.assertions(2)
 

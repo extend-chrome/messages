@@ -121,3 +121,72 @@ test('ignores wrong message', (done) => {
     done()
   }, 1500)
 })
+
+test('ignores primitive message', (done) => {
+  expect.assertions(0)
+
+  const message: CoreMessage = {
+    async: false,
+    scope: scope,
+    target: null,
+    payload: 15,
+  }
+  const sender = { id: 123 }
+  const respond = jest.fn()
+
+  stream.subscribe(() => {
+    done.fail()
+  })
+
+  chrome.runtime.onMessage.trigger(message, sender, respond)
+
+  setTimeout(() => {
+    done()
+  }, 1500)
+})
+
+test('ignores null message', (done) => {
+  expect.assertions(0)
+
+  const message: CoreMessage = {
+    async: false,
+    scope: scope,
+    target: null,
+    payload: null,
+  }
+  const sender = { id: 123 }
+  const respond = jest.fn()
+
+  stream.subscribe(() => {
+    done.fail()
+  })
+
+  chrome.runtime.onMessage.trigger(message, sender, respond)
+
+  setTimeout(() => {
+    done()
+  }, 1500)
+})
+
+test('ignores undefined message', (done) => {
+  expect.assertions(0)
+
+  const message: CoreMessage = {
+    async: false,
+    scope: scope,
+    target: null,
+    payload: undefined,
+  }
+  const sender = { id: 123 }
+  const respond = jest.fn()
+
+  stream.subscribe(() => {
+    done.fail()
+  })
+
+  chrome.runtime.onMessage.trigger(message, sender, respond)
+
+  setTimeout(() => {
+    done()
+  }, 1500)
+})

@@ -174,11 +174,7 @@ export function useScope(scope: string) {
         [T, Sender, ((response: R) => void)]
       > = stream.pipe(
         // Filter line messages
-        filter(
-          (x) =>
-            typeof x[0] === 'object' &&
-            x[0].greeting === greeting,
-        ),
+        filter(isInLine),
         // Map message to data
         map(([{ data }, s, r]) => [data, s, r]),
         filter(
@@ -191,15 +187,19 @@ export function useScope(scope: string) {
     } else {
       const _stream: Observable<[T, Sender]> = stream.pipe(
         // Filter line messages
-        filter((x) => {
-          return x[0].greeting === greeting
-        }),
+        filter(isInLine),
         // Map message to data
         map(([{ data }, s]) => [data, s]),
         filter((x): x is [T, Sender] => x.length < 3),
       )
 
       return [_send, _stream]
+    }
+
+    function isInLine([x]: any[]) {
+      return (
+        x && typeof x === 'object' && x.greeting === greeting
+      )
     }
   }
 
