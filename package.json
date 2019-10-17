@@ -40,6 +40,9 @@
       "pre-commit": "run-s format"
     }
   },
+  "dependencies": {
+    "rxjs": "^6.5.3"
+  },
   "devDependencies": {
     "@sucrase/jest-plugin": "^2.0.0",
     "@types/chrome": "0.0.81",
