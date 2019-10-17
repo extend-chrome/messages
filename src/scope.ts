@@ -174,9 +174,11 @@ export function useScope(scope: string) {
         [T, Sender, ((response: R) => void)]
       > = stream.pipe(
         // Filter line messages
-        filter((x) => {
-          return x[0].greeting === greeting
-        }),
+        filter(
+          (x) =>
+            typeof x[0] === 'object' &&
+            x[0].greeting === greeting,
+        ),
         // Map message to data
         map(([{ data }, s, r]) => [data, s, r]),
         filter(
