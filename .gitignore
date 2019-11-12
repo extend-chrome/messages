@@ -1,6 +1,5 @@
 node_modules/
 .rpt2_cache
-.vscode/
 lib/
 tests/e2e/extension-build
 playground/

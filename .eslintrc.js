@@ -3,17 +3,22 @@ module.exports = {
     browser: true,
     es6: true,
   },
-  extends: 'eslint:recommended',
   globals: {
     chrome: true,
   },
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
   },
+  parserOptions: {
+    project: './tsconfig.json',
+  },
+  plugins: ['@typescript-eslint'],
   rules: {
     'no-console': 'off',
     quotes: 'off',
     semi: 'off',
+    '@typescript-eslint/restrict-plus-operands': 'error',
   },
 }

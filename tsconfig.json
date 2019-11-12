@@ -6,11 +6,12 @@
     "moduleResolution": "node",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "outDir": "dist",
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
-    "lib": ["es2017", "dom", "esnext.array"]
+    "lib": ["es2017", "dom", "esnext.array"],
+    "outDir": "lib"
   },
+  "include": ["src", "tests"],
   "exclude": ["lib", "playground", "types"]
 }
