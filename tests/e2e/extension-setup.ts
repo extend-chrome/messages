@@ -1,4 +1,4 @@
-import { rollup, RollupOptions } from 'rollup'
+import { rollup, RollupOptions, OutputOptions } from 'rollup'
 
 export const buildExtension = async (options: RollupOptions) => {
   try {
@@ -9,7 +9,7 @@ export const buildExtension = async (options: RollupOptions) => {
       )
 
     const bundle = await rollup(options)
-    await bundle.write(options.output)
+    await bundle.write(options.output as OutputOptions)
   } catch (error) {
     console.error(error)
   }
