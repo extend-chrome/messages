@@ -7,6 +7,18 @@ import { AsyncMessageListener, MessageListener } from './types'
 /** The tab that sent the message */
 type Sender = chrome.runtime.MessageSender
 
+type SendOptions =
+  | {
+      target: string | number
+    }
+  | {
+      tabId: number
+    }
+
+type AsyncSendOptions = SendOptions & {
+  async: true
+}
+
 /**
  * Get a messages scope by name.
  */
@@ -25,31 +37,17 @@ export function useScope(scope: string) {
    */
   function send<T, R>(
     data: T,
-    options: {
-      tabId?: number
-      target?: number | string
-      async: true
-    },
+    options: AsyncSendOptions,
   ): Promise<R>
-  function send<T>(
-    data: T,
-    options: {
-      tabId?: number
-      target?: number | string
-    },
-  ): Promise<void>
+  function send<T>(data: T, options: SendOptions): Promise<void>
   function send<T>(data: T): Promise<void>
   async function send<T, R>(
     data: T,
-    options?: {
-      tabId?: number
-      target?: number | string
-      async?: true
-    },
+    options?: SendOptions & { async?: true },
   ) {
-    options = options || {}
-    options.target = options.target || options.tabId
-    const { async = false, target } = options
+    const _options: any = options || {}
+    _options.target = _options.target || _options.tabId
+    const { async = false, target } = _options
 
     if (async) {
       return _asyncSend(data, target)
@@ -120,23 +118,13 @@ export function useScope(scope: string) {
     greeting: string,
     options: { async: true },
   ): [
-    (
-      data: T,
-      options?: {
-        target: string | number
-      },
-    ) => Promise<R>,
+    (data: T, options?: SendOptions) => Promise<R>,
     Observable<[T, Sender, (response: R) => void]>,
   ]
   function useLine<T>(
     greeting: string,
   ): [
-    (
-      data: T,
-      options?: {
-        target: string | number
-      },
-    ) => Promise<void>,
+    (data: T, options?: SendOptions) => Promise<void>,
     Observable<[T, Sender]>,
   ]
   function useLine<T, R>(
