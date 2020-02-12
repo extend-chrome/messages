@@ -9,7 +9,7 @@ type Sender = chrome.runtime.MessageSender
 
 type SendOptions =
   | {
-      target: string | number
+      target: string | number | undefined
     }
   | {
       tabId: number
