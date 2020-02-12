@@ -35,8 +35,6 @@ An API for Chrome extension messaging that makes sense. Uses Promises and Observ
 
 > This library is in beta until version 1.0.0. The API may change between minor versions.
 
-> This library is in beta mode, so API changes may occur between minor versions before version 1.0.0.
-
 ## Table of Contents
 
 - [Getting Started](#getting_started)
@@ -92,20 +90,6 @@ document.body.onclick = () => {
 }
 ```
 
-## Features <a name = "features"></a>
-
-### TypeScript Definitions <a name = "typescript"></a>
-
-This library is written in TypeScript, extensively typed, and definitions are included, so no need to install an additional `@types` library!
-
-### RxJs Observables
-
-Version 0.5.0 includes an [RxJs Observable](https://rxjs-dev.firebaseapp.com/guide/overview) as [`messages.stream`](#api-messages-stream).
-
-### Lines
-
-Version 0.5.0 introduces [`useLine`](#usage), a convenient way to setup your messaging system.
-
 ### Lines have great TypeScript support!
 
 If you're into TypeScript (you are, aren't you?), `useLine` is a generic function. It shines when you define the message data type. No more message data type mistakes! Intellisense has you covered.
@@ -142,6 +126,16 @@ sendStats({ hi: 30, low: 14, date: '11/12/2019' })
 // Throws a type error
 sendStats('not a Stats object')
 ```
+
+## Features <a name = "features"></a>
+
+### TypeScript Definitions <a name = "typescript"></a>
+
+This library is written in TypeScript, extensively typed, and definitions are included, so no need to install an additional `@types` library!
+
+### RxJs Observables
+
+Version 0.5.0 includes an [RxJs Observable](https://rxjs-dev.firebaseapp.com/guide/overview) as [`messages.stream`](#api-messages-stream).
 
 ### Scopes
 
@@ -246,7 +240,7 @@ messages.on((message, sender) => {
 
 ##### Async Messages <a name = "api-messages-on-async"></a>
 
-> I've found relying on async messages to be a bit of an anti-pattern. Chrome is pretty aggressive about closing the response port, so unless you're doing something synchronous or very fast, it's better to send a separate message and listerner to handle responses.
+> I've found relying on async messages to be a bit of an anti-pattern. Chrome is pretty aggressive about closing the response port, so unless you're doing something synchronous or very fast, it's better to send a separate message and listener to handle responses.
 
 To receive async messages, use a message handler with 3 arguments. This handler will only receive messages sent with the async option. 
 
