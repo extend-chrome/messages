@@ -26,6 +26,7 @@ export function useScope(scope: string) {
   function send<T, R>(
     data: T,
     options: {
+      tabId?: number
       target?: number | string
       async: true
     },
@@ -33,6 +34,7 @@ export function useScope(scope: string) {
   function send<T>(
     data: T,
     options: {
+      tabId?: number
       target?: number | string
     },
   ): Promise<void>
@@ -40,11 +42,14 @@ export function useScope(scope: string) {
   async function send<T, R>(
     data: T,
     options?: {
+      tabId?: number
       target?: number | string
       async?: true
     },
   ) {
-    const { async = false, target } = options || {}
+    options = options || {}
+    options.target = options.target || options.tabId
+    const { async = false, target } = options
 
     if (async) {
       return _asyncSend(data, target)
@@ -97,7 +102,7 @@ export function useScope(scope: string) {
   /** Untyped Observable of all messages in scope */
   const stream = merge(
     fromEventPattern<[any, Sender]>(_on, _off),
-    fromEventPattern<[any, Sender, ((data: any) => void)]>(
+    fromEventPattern<[any, Sender, (data: any) => void]>(
       _asyncOn,
       _off,
     ),
@@ -121,7 +126,7 @@ export function useScope(scope: string) {
         target: string | number
       },
     ) => Promise<R>,
-    Observable<[T, Sender, ((response: R) => void)]>,
+    Observable<[T, Sender, (response: R) => void]>,
   ]
   function useLine<T>(
     greeting: string,
@@ -170,15 +175,17 @@ export function useScope(scope: string) {
     }
 
     if (async) {
-      const _stream: Observable<
-        [T, Sender, ((response: R) => void)]
-      > = stream.pipe(
+      const _stream: Observable<[
+        T,
+        Sender,
+        (response: R) => void,
+      ]> = stream.pipe(
         // Filter line messages
         filter(isInLine),
         // Map message to data
         map(([{ data }, s, r]) => [data, s, r]),
         filter(
-          (x): x is [T, Sender, ((response: R) => void)] =>
+          (x): x is [T, Sender, (response: R) => void] =>
             x.length === 3,
         ),
       )
