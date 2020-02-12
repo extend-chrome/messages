@@ -5,4 +5,3 @@ jsxSingleQuote: true
 printWidth: 65
 singleQuote: true
 arrowParens: "always"
-parser: "typescript"
