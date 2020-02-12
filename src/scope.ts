@@ -10,8 +10,10 @@ type Sender = chrome.runtime.MessageSender
 type SendOptions =
   | {
       target: string | number | undefined
+      tabId?: undefined
     }
   | {
+      target?: undefined
       tabId: number
     }
 
@@ -138,16 +140,19 @@ export function useScope(scope: string) {
 
     const { async } = options || {}
 
-    const _send = (
-      data: T,
-      _options?: { target: number | string },
-    ) => {
+    const _send = (data: T, _options?: SendOptions) => {
       interface LineMessage {
         greeting: string
         data: T
       }
 
-      const { target } = _options || {}
+      _options = _options || {} as SendOptions
+      let target: number | string | undefined
+      if (typeof _options.tabId === 'number') {
+        target = _options.tabId
+      } else {
+        target = _options.target
+      }
 
       if (async) {
         return send<LineMessage, R>(
