@@ -34,7 +34,7 @@
     "test:e2e": "jest e2e --runInBand",
     "test:full": "run-s test:quick test:e2e",
     "test:quick": "jest --testPathIgnorePatterns=e2e",
-    "preversion": "run-s test:full",
+    "preversion": "run-s test:quick",
     "postversion": "run-s build:pro build:types release"
   },
   "peerDependencies": {
