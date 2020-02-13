@@ -1,7 +1,7 @@
-semi: false
-tabWidth: 2
-trailingComma: "all"
+arrowParens: always
 jsxSingleQuote: true
-printWidth: 65
+proseWrap: always
+semi: false
 singleQuote: true
-arrowParens: "always"
+tabWidth: 2
+trailingComma: all

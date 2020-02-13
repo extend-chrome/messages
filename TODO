@@ -1,7 +1,7 @@
 
 Todo:
   ✔ Update eslint config to typescript (use storage config) @high @started(20-02-13 08:20) @done(20-02-13 08:36) @lasted(16m52s)
-  ☐ Update prettier config
+  ✔ Update prettier config @done(20-02-13 08:40)
   ☐ Add tests for alternative send options
   ☐ Fix e2e tests
   ☐ Convert to @bumble/jest-chrome

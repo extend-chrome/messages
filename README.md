@@ -31,9 +31,11 @@ https://imgur.com/cKFLQ0o.png
 
 ---
 
-An API for Chrome extension messaging that makes sense. Uses Promises and Observables for convenience.
+An API for Chrome extension messaging that makes sense. Uses Promises and
+Observables for convenience.
 
-> This library is in beta until version 1.0.0. The API may change between minor versions.
+> This library is in beta until version 1.0.0. The API may change between minor
+> versions.
 
 ## Table of Contents
 
@@ -44,9 +46,12 @@ An API for Chrome extension messaging that makes sense. Uses Promises and Observ
 
 ## Getting started <a name = "getting_started"></a>
 
-You will need to use a bundler like [Rollup](https://rollupjs.org/guide/en/), Parcel, or Webpack to include this library in the build of Chrome extension.
+You will need to use a bundler like [Rollup](https://rollupjs.org/guide/en/),
+Parcel, or Webpack to include this library in the build of Chrome extension.
 
-See [`rollup-plugin-chrome-extension`](https://github.com/bumble-org/rollup-plugin-chrome-extension) for an easy way use Rollup to build your Chrome extension!
+See
+[`rollup-plugin-chrome-extension`](https://github.com/bumble-org/rollup-plugin-chrome-extension)
+for an easy way use Rollup to build your Chrome extension!
 
 ### Installation
 
@@ -56,7 +61,8 @@ $ npm i @bumble/messages
 
 ## Usage <a name = "usage"></a>
 
-Send and receive messages using convenient Lines, or with a traditional messages object.
+Send and receive messages using convenient Lines, or with a traditional messages
+object.
 
 ```javascript
 // messages.js, used in both the background and content script
@@ -92,7 +98,9 @@ document.body.onclick = () => {
 
 ### Lines have great TypeScript support!
 
-If you're into TypeScript (you are, aren't you?), `useLine` is a generic function. It shines when you define the message data type. No more message data type mistakes! Intellisense has you covered.
+If you're into TypeScript (you are, aren't you?), `useLine` is a generic
+function. It shines when you define the message data type. No more message data
+type mistakes! Intellisense has you covered.
 
 ```typescript
 // messages.ts
@@ -109,7 +117,7 @@ export const [sendStats, statsStream] = useLine<Stats>('STATS')
 
 ```typescript
 // background.ts
-import { statsStream } from "./messages";
+import { statsStream } from './messages'
 
 statsStream.subscribe(([{ hi, lo, date }, sender]) => {
   // Intellisense knows this is an Observable of
@@ -131,17 +139,22 @@ sendStats('not a Stats object')
 
 ### TypeScript Definitions <a name = "typescript"></a>
 
-This library is written in TypeScript, extensively typed, and definitions are included, so no need to install an additional `@types` library!
+This library is written in TypeScript, extensively typed, and definitions are
+included, so no need to install an additional `@types` library!
 
 ### RxJs Observables
 
-Version 0.5.0 includes an [RxJs Observable](https://rxjs-dev.firebaseapp.com/guide/overview) as [`messages.stream`](#api-messages-stream).
+Version 0.5.0 includes an
+[RxJs Observable](https://rxjs-dev.firebaseapp.com/guide/overview) as
+[`messages.stream`](#api-messages-stream).
 
 ### Scopes
 
-Version 0.5.0 introduces [`useScope`](#api-use-scope), a way to use a separate messaging space.
+Version 0.5.0 introduces [`useScope`](#api-use-scope), a way to use a separate
+messaging space.
 
-This is useful if you are writing a library for Chrome extensions that uses messages internally, but you don't want to pollute the global messaging space.
+This is useful if you are writing a library for Chrome extensions that uses
+messages internally, but you don't want to pollute the global messaging space.
 
 ## API <a name = "api"></a>
 
@@ -153,7 +166,10 @@ import { useLine } from '@bumble/messages'
 const [sendMessage, messageStream] = useLine('greeting')
 ```
 
-Use this function to create a message system to import into both the message sender and receiver context (ie, the background page and a content script). `useLine` is a TypeScript generic function. See the [Usage](#usage) section for more information, including TypeScript support!
+Use this function to create a message system to import into both the message
+sender and receiver context (ie, the background page and a content script).
+`useLine` is a TypeScript generic function. See the [Usage](#usage) section for
+more information, including TypeScript support!
 
 #### `greeting`
 
@@ -165,17 +181,22 @@ A unique string to identify the message.
 
 > Type: `[function, Observable]`
 
-Import the messageSender into the context you wish to send a message. Call the sender with the data you want to send.
+Import the messageSender into the context you wish to send a message. Call the
+sender with the data you want to send.
 
-`messageStream` is an Observable of a `[data, MessageSender]` tuple. Import the messageStream into the context you wish to recieve messages. Subscribe to it with a message handler function.
+`messageStream` is an Observable of a `[data, MessageSender]` tuple. Import the
+messageStream into the context you wish to recieve messages. Subscribe to it
+with a message handler function.
 
 ### The `messages` Namespace
 
-If you're more comfortable with a traditional messages namespace, import the `messages` object.
+If you're more comfortable with a traditional messages namespace, import the
+`messages` object.
 
-#### `messages.send(data, [options])` <a name = "api-messages-send"></a> 
+#### `messages.send(data, [options])` <a name = "api-messages-send"></a>
 
-Sending one-way messages is simple: just call `messages.send` with an object that includes at least a `greeting` property.
+Sending one-way messages is simple: just call `messages.send` with an object
+that includes at least a `greeting` property.
 
 ```javascript
 // content-script.js
@@ -191,18 +212,20 @@ messages
   .send({
     greeting: 'with-data',
     // You can use any prop name or value
-    data: { x: 1 }
+    data: { x: 1 },
   })
   .then(() => {
     console.log('The message was sent.')
   })
 ```
 
-Actually, you can send any data type as a message, but an object with a `greeting` prop is a nice, flexible pattern.
+Actually, you can send any data type as a message, but an object with a
+`greeting` prop is a nice, flexible pattern.
 
 ##### Get a response with `options.async` <a name = "api-messages-send-async"></a>
 
-Set the optional `options.async` to `true` to receive a response. Only message listeners with the third `sendResponse` argument will receive async messages.
+Set the optional `options.async` to `true` to receive a response. Only message
+listeners with the third `sendResponse` argument will receive async messages.
 
 ```javascript
 // content-script.js
@@ -213,7 +236,7 @@ messages
     // Message
     { greeting: 'hello' },
     // Options
-    { async: true }
+    { async: true },
   )
   .then((response) => {
     console.log('They said', response.greeting)
@@ -222,7 +245,9 @@ messages
 
 #### `messages.on(handler)` <a name = "api-messages-on"></a>
 
-To receive one way messages, use a message handler function with 0 or 1 arguments. This handler will only receive messages sent without the async option.
+To receive one way messages, use a message handler function with 0 or 1
+arguments. This handler will only receive messages sent without the async
+option.
 
 The return value of the handler is unused.
 
@@ -240,11 +265,16 @@ messages.on((message, sender) => {
 
 ##### Async Messages <a name = "api-messages-on-async"></a>
 
-> I've found relying on async messages to be a bit of an anti-pattern. Chrome is pretty aggressive about closing the response port, so unless you're doing something synchronous or very fast, it's better to send a separate message and listener to handle responses.
+> I've found relying on async messages to be a bit of an anti-pattern. Chrome is
+> pretty aggressive about closing the response port, so unless you're doing
+> something synchronous, it's better to send a separate message and use a
+> listener to handle responses.
 
-To receive async messages, use a message handler with 3 arguments. This handler will only receive messages sent with the async option. 
+To receive async messages, use a message handler with 3 arguments. This handler
+will only receive messages sent with the async option.
 
-The third argument is a `sendResponse` function, which must be called relatively quickly, or Chrome will throw an error.
+The third argument is a `sendResponse` function, which must be called relatively
+quickly, or Chrome will throw an error.
 
 ```javascript
 // Async functions are OK!
@@ -284,7 +314,8 @@ messages.stream.subscribe(([message, sender, sendResponse]) => {
 
 ### `useScope` <a name = "api-use-scope"></a>
 
-This is useful if you are writing a library for Chrome extensions that uses messages internally, but you don't want to pollute the global messaging space.
+This is useful if you are writing a library for Chrome extensions that uses
+messages internally, but you don't want to pollute the global messaging space.
 
 ```javascript
 import { messages, useScope } from '@bumble/messages'
@@ -298,4 +329,6 @@ myScope.send({ greeting: 'hey' })
 messages.send({ greeting: 'hello?' })
 ```
 
-> Note: The Chrome API Event `chrome.runtime.onMessage` will still receive all messages, but projects using `@bumble/messages` will not receive messages from other scopes.
+> Note: The Chrome API Event `chrome.runtime.onMessage` will still receive all
+> messages, but projects using `@bumble/messages` will not receive messages from
+> other scopes.
