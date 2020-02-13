@@ -4,6 +4,7 @@ import delay from 'delay'
 import { Browser, Target, Page, launch } from 'puppeteer'
 
 import { buildExtension } from './extension-setup'
+import { onMessage, sendMessage } from './test-utils'
 const { options } = require('./extension-src/rollup.config')
 
 let browser: Browser
@@ -77,24 +78,4 @@ describe('chrome.tabs', () => {
   test.todo('multiple listeners, two responses')
 })
 
-// TODO: factor out into tests.ts
-function onMessage(response: any) {
-  return new Promise((resolve) => {
-    chrome.runtime.onMessage.addListener(
-      (message, sender, sendResponse) => {
-        sendResponse(response)
-        resolve(message)
-        return true
-      },
-    )
-  })
-}
 
-// TODO: factor out into tests.ts
-function sendMessage(message: any) {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage(message, (response) => {
-      resolve(response)
-    })
-  })
-}
