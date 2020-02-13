@@ -11,13 +11,13 @@
   },
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.esm.js",
+  "types": "types/index.d.ts",
   "files": [
     "lib",
     "types"
   ],
-  "main": "lib/index.cjs.js",
-  "module": "lib/index.esm.js",
-  "types": "types/index.d.ts",
   "scripts": {
     "build": "run-p build:dev",
     "build:dev": "rollup -c --environment NODE_ENV:development",
@@ -37,37 +37,42 @@
     "preversion": "run-s test:quick",
     "postversion": "run-s build:pro build:types release"
   },
-  "peerDependencies": {
-    "rxjs": "^6.5.3"
-  },
   "devDependencies": {
-    "@types/chrome": "0.0.91",
-    "@types/jest": "^24.0.22",
-    "@types/node": "^12.12.7",
-    "@types/power-assert": "^1.5.0",
-    "@types/puppeteer": "^1.20.2",
+    "@sucrase/jest-plugin": "^2.0.0",
+    "@types/chrome": "0.0.95",
+    "@types/jest": "^25.1.2",
+    "@types/jest-in-case": "^1.0.1",
+    "@types/node": "^13.7.1",
+    "@types/power-assert": "^1.5.3",
+    "@types/puppeteer": "^2.0.0",
     "@types/sinon-chrome": "^2.2.6",
-    "@typescript-eslint/eslint-plugin": "^2.7.0",
-    "@typescript-eslint/parser": "^2.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.19.2",
+    "@typescript-eslint/parser": "^2.19.2",
     "chrome-promise": "^3.0.5",
     "delay": "^4.3.0",
-    "eslint": "^6.6.0",
-    "jest": "^24.9.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-jest": "^23.7.0",
+    "jest": "^25.1.0",
+    "jest-in-case": "^1.0.2",
     "npm-run-all": "^4.1.5",
     "power-assert": "^1.6.1",
     "prettier": "^1.19.1",
-    "puppeteer": "^2.0.0",
-    "rollup": "^1.26.5",
-    "rollup-plugin-chrome-extension": "^1.2.6",
+    "puppeteer": "^2.1.1",
+    "rollup": "^1.31.0",
+    "rollup-plugin-chrome-extension": "^2.1.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-empty-dir": "^1.0.4",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-typescript": "^1.0.1",
-    "rollup-plugin-zip": "^0.5.2",
+    "rollup-plugin-zip": "^0.7.0",
     "sinon-chrome": "^3.0.1",
-    "sort-package-json": "^1.23.1",
-    "ts-jest": "^24.1.0",
+    "sort-package-json": "^1.39.1",
+    "ts-jest": "^25.2.0",
     "tslib": "^1.10.0",
-    "typescript": "^3.7.2"
+    "rxjs": "^6.5.4",
+    "typescript": "^3.7.5"
+  },
+  "peerDependencies": {
+    "rxjs": "^6.5.4"
   }
 }
