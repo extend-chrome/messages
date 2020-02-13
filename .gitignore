@@ -4,3 +4,4 @@ lib/
 tests/e2e/extension-build
 playground/
 types
+**/*.log
