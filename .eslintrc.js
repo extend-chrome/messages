@@ -3,6 +3,7 @@
 /* ----------------------------------------------------------- */
 
 const rules = {
+  '@typescript-eslint/no-misused-promises': 'off',
   '@typescript-eslint/camelcase': 'off',
   '@typescript-eslint/explicit-function-return-type': 'off',
   '@typescript-eslint/member-delimiter-style': [

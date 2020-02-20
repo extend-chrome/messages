@@ -30,10 +30,11 @@
     "release": "git push && npm publish",
     "start": "run-p build:watch",
     "pretest": "run-s build",
-    "test": "npm run test:quick",
+    "test": "npm run test:watch",
     "test:e2e": "jest e2e --runInBand",
     "test:full": "run-s test:quick test:e2e",
     "test:quick": "jest --testPathIgnorePatterns=e2e",
+    "test:watch": "jest --testPathIgnorePatterns=e2e --watch",
     "preversion": "run-s test:quick",
     "postversion": "run-s build:pro build:types release"
   },
@@ -65,14 +66,16 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-typescript": "^1.0.1",
     "rollup-plugin-zip": "^0.7.0",
-    "sinon-chrome": "^3.0.1",
+    "rxjs": "^6.5.4",
     "sort-package-json": "^1.39.1",
     "ts-jest": "^25.2.0",
     "tslib": "^1.10.0",
-    "rxjs": "^6.5.4",
     "typescript": "^3.7.5"
   },
   "peerDependencies": {
     "rxjs": "^6.5.4"
+  },
+  "dependencies": {
+    "@bumble/jest-chrome": "0.4.0"
   }
 }

@@ -12,7 +12,7 @@
     "lib": ["es2017", "dom", "esnext.array"],
     "outDir": "lib"
   },
-  "include": ["src", "tests"],
+  "include": ["src", "tests", "jest.config.js"],
   "exclude": ["lib", "playground", "types"],
   "typeAcquisition": { "enable": true }
 }
