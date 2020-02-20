@@ -1,54 +1,42 @@
-import { _listeners, _getListener } from '../../src/ListenerMap'
-
-import * as chrome from 'sinon-chrome'
-import assert from 'power-assert'
+import { chrome } from '@bumble/jest-chrome'
+import { _getListener, _listeners } from '../../src/ListenerMap'
+import { useScope } from '../../src/scope'
 import { CoreMessage, MessageListener } from '../../src/types'
 
-import { useScope } from '../../src/scope'
+const addListenerSpy = jest.spyOn(chrome.runtime.onMessage, 'addListener')
 
 const scope = 'test'
 const messages = useScope(scope)
 
-let lastError: { message: string } | undefined
-const lastErrorSpy = jest.fn(() => lastError)
-Object.defineProperty(chrome.runtime, 'lastError', {
-  get: lastErrorSpy,
-})
-
-console.error = jest.fn()
-
-afterEach(() => {
-  lastError = undefined
-  chrome.reset()
-  _listeners.clear()
-})
-
-const message = {
+const payload = {
   greeting: 'hello',
 }
 const coreMessage: CoreMessage = {
   async: false,
-  target: null,
-  payload: message,
+  payload,
   scope,
 }
+
 const sender = {} // Not used directly by @bumble/messages
 const sendResponse = jest.fn()
-const messageEventArgs = [coreMessage, sender, sendResponse]
+
+afterEach(() => {
+  jest.clearAllMocks()
+  _listeners.clear()
+})
 
 test('listens to runtime.onMessage', () => {
   const listener = jest.fn() as MessageListener
 
   messages.on(listener)
 
-  assert(chrome.runtime.onMessage.addListener.called)
-
+  expect(addListenerSpy).toBeCalled()
   expect(listener).not.toBeCalled()
 
   const _listener = _getListener(scope, listener)
   expect(_listener).toBeDefined()
 
-  chrome.runtime.onMessage.trigger(...messageEventArgs)
+  chrome.runtime.onMessage.callListeners(coreMessage, sender, sendResponse)
 
   expect(listener).toBeCalled()
 })
@@ -73,13 +61,9 @@ test('listener receives CoreMessage payload', () => {
   const listener = jest.fn()
 
   messages.on(listener)
-  chrome.runtime.onMessage.trigger(...messageEventArgs)
+  chrome.runtime.onMessage.callListeners(coreMessage, sender, sendResponse)
 
-  expect(listener).toBeCalledWith(
-    coreMessage.payload,
-    sender,
-    // should not receive respond fn
-  )
+  expect(listener).toBeCalledWith(coreMessage.payload, sender)
 })
 
 test('adds listener to _listeners Map', () => {
@@ -95,106 +79,38 @@ describe('filtering', () => {
     const listener = jest.fn()
 
     messages.on(listener)
-    chrome.runtime.onMessage.trigger(coreMessage, sender)
+    chrome.runtime.onMessage.callListeners(coreMessage, sender, sendResponse)
 
     expect(listener).toBeCalled()
+    expect(sendResponse).not.toBeCalled()
   })
 
   test('ignores async messages', () => {
     const asyncMessage: CoreMessage = {
       async: true,
-      payload: message,
-      target: null,
+      payload: payload,
       scope,
     }
 
     const listener = jest.fn()
 
     messages.on(listener)
-    chrome.runtime.onMessage.trigger(asyncMessage, sender)
-
-    expect(listener).not.toBeCalled()
-  })
-
-  test('receives messages for own target name', () => {
-    const target = 'background'
-    const coreMessage: CoreMessage = {
-      async: false,
-      payload: message,
-      target,
-      scope,
-    }
-
-    const listener = jest.fn()
-
-    messages.on(listener, target)
-    chrome.runtime.onMessage.trigger(coreMessage, sender)
-
-    expect(listener).toBeCalled()
-  })
-
-  test('ignores messages for other targets', () => {
-    const target = 'background'
-    const coreMessage: CoreMessage = {
-      async: false,
-      payload: message,
-      target: 'options',
-      scope,
-    }
-
-    const listener = jest.fn()
-
-    messages.on(listener, target)
-    chrome.runtime.onMessage.trigger(coreMessage, sender)
-
-    expect(listener).not.toBeCalled()
-  })
-
-  test('receives general messages if no target', () => {
-    const coreMessage: CoreMessage = {
-      async: false,
-      payload: message,
-      target: null,
-      scope,
-    }
-
-    const listener = jest.fn()
-
-    messages.on(listener)
-    chrome.runtime.onMessage.trigger(coreMessage, sender)
-
-    expect(listener).toBeCalled()
-  })
-
-  test('ignores targeted messages if no target', () => {
-    const coreMessage: CoreMessage = {
-      async: false,
-      payload: message,
-      target: 'options',
-      scope,
-    }
-
-    const listener = jest.fn()
-
-    messages.on(listener)
-    chrome.runtime.onMessage.trigger(coreMessage, sender)
+    chrome.runtime.onMessage.callListeners(asyncMessage, sender, sendResponse)
 
     expect(listener).not.toBeCalled()
   })
 
   test('ignores messages for other scopes', () => {
-    const target = 'background'
     const coreMessage: CoreMessage = {
       async: false,
-      payload: message,
-      target: 'options',
+      payload: payload,
       scope: 'another scope',
     }
 
     const listener = jest.fn()
 
-    messages.on(listener, target)
-    chrome.runtime.onMessage.trigger(coreMessage, sender)
+    messages.on(listener)
+    chrome.runtime.onMessage.callListeners(coreMessage, sender, sendResponse)
 
     expect(listener).not.toBeCalled()
   })

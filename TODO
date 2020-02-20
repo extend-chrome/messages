@@ -23,8 +23,8 @@ Update configs:
   
 Convert to jest-chrome:
   ✔ Convert `events-async.test.ts` @started(20-02-13 08:40) @done(20-02-13 12:24) @lasted(3h44m6s)
-  ☐ Convert `events-off.test.ts`
-  ☐ Convert `events-one-way.test.ts`
+  ✔ Convert `events-off.test.ts` @done(20-02-20 08:15)
+  ✔ Convert `events-one-way.test.ts` @started(20-02-20 08:15) @done(20-02-20 08:18) @lasted(3m30s)
   ✔ Convert `send-async.test.ts` @done(20-02-20 08:13)
   ☐ Convert `send-one-way.test.ts`
   ☐ Convert `use-line-async.test.ts`
