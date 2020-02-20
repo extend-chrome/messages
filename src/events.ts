@@ -1,39 +1,23 @@
-import {
-  _getListener,
-  _removeListener,
-  _setListener,
-} from './ListenerMap'
+import { _getListener, _removeListener, _setListener } from './ListenerMap'
 import {
   AsyncMessageListener,
   CoreListener,
   CoreResponse,
   MessageListener,
-  TargetName,
 } from './types'
 
-export const scopeOn = (scope: string) => (
-  callback: MessageListener,
-  target?: TargetName,
-) => {
+export const scopeOn = (scope: string) => (callback: MessageListener) => {
   const listener: CoreListener = (message, sender) => {
     if (message.async || message.scope !== scope) {
       return false
     }
 
-    if (
-      typeof message.target === 'number' || // is content script
-      !message.target || // general message
-      message.target === target // is correct target
-    ) {
-      try {
-        callback(message.payload, sender)
-      } catch (error) {
-        // Log listener error
-        console.error(
-          'Uncaught error in chrome.runtime.onMessage listener',
-        )
-        console.error(error)
-      }
+    try {
+      callback(message.payload, sender)
+    } catch (error) {
+      // Log listener error
+      console.error('Uncaught error in chrome.runtime.onMessage listener')
+      console.error(error)
     }
 
     return false
@@ -45,49 +29,39 @@ export const scopeOn = (scope: string) => (
 
 export const scopeAsyncOn = (scope: string) => (
   callback: AsyncMessageListener,
-  target?: TargetName,
 ) => {
-  const listener: CoreListener = (
-    { async, payload, target: _target, scope: _scope },
-    sender,
-    sendResponse,
-  ) => {
-    if (
-      async &&
-      scope === _scope &&
-      (typeof _target === 'number' ||
-        !_target ||
-        _target === target)
-    ) {
-      ;(async () => {
-        try {
-          const respond = (response: any): void => {
-            const coreResponse: CoreResponse = {
-              success: true,
-              payload: response,
-            }
-
-            sendResponse(coreResponse)
-          }
-
-          await callback(payload, sender, respond)
-        } catch (error) {
-          const response: CoreResponse = {
-            success: false,
-            payload: {
-              greeting: error.message,
-            },
-          }
-
-          console.error(error)
-          sendResponse(response)
-        }
-      })()
-
+  const listener: CoreListener = (message, sender, sendResponse) => {
+    if (message.async && scope === message.scope) {
+      handleMessage()
       return true
     }
 
     return false
+
+    async function handleMessage() {
+      try {
+        const respond = (response: any): void => {
+          const coreResponse: CoreResponse = {
+            success: true,
+            payload: response,
+          }
+
+          sendResponse(coreResponse)
+        }
+
+        await callback(message.payload, sender, respond)
+      } catch (error) {
+        const response: CoreResponse = {
+          success: false,
+          payload: {
+            greeting: error.message,
+          },
+        }
+
+        console.error(error)
+        sendResponse(response)
+      }
+    }
   }
 
   chrome.runtime.onMessage.addListener(listener)
