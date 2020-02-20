@@ -1,136 +1,59 @@
+import { chrome } from '@bumble/jest-chrome'
 import { useScope } from '../../src/scope'
-
-import * as chrome from 'sinon-chrome'
-import assert from 'power-assert'
-import {
-  TargetName,
-  CoreMessage,
-  CoreResponse,
-} from '../../src/types'
+import { CoreMessage, CoreResponse } from '../../src/types'
 
 const scope = 'test'
 const messages = useScope(scope)
 
-let lastError: { message: string } | undefined
-const lastErrorSpy = jest.fn(() => lastError)
-Object.defineProperty(chrome.runtime, 'lastError', {
-  get: lastErrorSpy,
-})
+let lastErrorMessage: string
+const lastErrorSpy = jest.fn(() => lastErrorMessage)
+const lastError = {
+  get message() {
+    return lastErrorSpy()
+  },
+}
 
-afterEach(() => {
-  lastError = undefined
-  chrome.reset()
-})
+chrome.runtime.lastError
 
-test('creates async message', () => {
-  const message = { greeting: 'hello' }
+afterEach(jest.clearAllMocks)
 
-  messages.send(message, { async: true })
-
-  expect(
-    chrome.runtime.sendMessage.firstCall.args[0],
-  ).toMatchObject({ async: true })
-})
-
-test('creates general message if no target', () => {
-  const message = { greeting: 'hello' }
-
-  messages.send(message, { async: true })
-
-  expect(
-    chrome.runtime.sendMessage.firstCall.args[0],
-  ).toMatchObject({ target: null })
-})
-
-test('calls runtime.sendMessage if no target', () => {
-  const message = { greeting: 'hello' }
-
-  messages.send(message, { async: true })
-
-  assert(
-    chrome.runtime.sendMessage.called,
-    'runtime.sendMessage was not called',
-  )
-})
-
-test('creates targeted message if target', () => {
-  const message = { greeting: 'hello' }
-  const target: TargetName = 'background'
-
-  messages.send(message, { target, async: true })
-
-  expect(
-    chrome.runtime.sendMessage.firstCall.args[0],
-  ).toMatchObject({ target })
-})
-
-test('calls runtime.sendMessage if target is string', () => {
-  const message = { greeting: 'hello' }
-  const target: TargetName = 'background'
-
-  messages.send(message, { target, async: true })
-
-  assert(
-    chrome.runtime.sendMessage.called,
-    'runtime.sendMessage was not called',
-  )
-})
-
-test('calls tabs.sendMessage if target is number', () => {
-  const message = { greeting: 'hello' }
-  const target: TargetName = 1234
-
-  messages.send(message, { target, async: true })
-
-  assert(
-    chrome.tabs.sendMessage.called,
-    'tabs.sendMessage was not called',
-  )
-})
-
-test('creates async coreMessage', () => {
-  const message = { greeting: 'hello' }
-  const target: TargetName = 'background'
-
+test('sends async CoreMessage to runtime', () => {
+  const payload = { greeting: 'hello' }
   const coreMessage: CoreMessage = {
     async: true,
-    target,
-    payload: message,
+    payload,
     scope,
   }
 
-  messages.send(message, { target, async: true })
+  messages.send(payload, { async: true })
 
-  const { firstCall } = chrome.runtime.sendMessage
-  const [result] = firstCall.args
-
-  expect(result.async).toBe(true)
-  expect(result).toEqual(coreMessage)
+  expect(chrome.runtime.sendMessage).toBeCalledWith(
+    coreMessage,
+    expect.any(Function),
+  )
 })
 
-test('creates scoped coreMessage', () => {
-  const message = { greeting: 'hello' }
-  const target: TargetName = 'background'
+test('sends async CoreMessage to tab', () => {
+  const payload = { greeting: 'hello' }
+  const tabId = 1234
 
   const coreMessage: CoreMessage = {
     async: true,
-    target,
-    payload: message,
+    payload,
     scope,
   }
 
-  messages.send(message, { target, async: true })
+  messages.send(payload, { tabId, async: true })
 
-  const { firstCall } = chrome.runtime.sendMessage
-  const [result] = firstCall.args
-
-  expect(result.scope).toBe(scope)
-  expect(result).toEqual(coreMessage)
+  expect(chrome.tabs.sendMessage).toBeCalledWith(
+    tabId,
+    coreMessage,
+    expect.any(Function),
+  )
 })
 
 test('resolves with response', async () => {
   const message = { greeting: 'hello' }
-  const target: TargetName = 'background'
 
   const response = { greeting: 'goodbye' }
   const coreResponse: CoreResponse = {
@@ -138,10 +61,13 @@ test('resolves with response', async () => {
     success: true,
   }
 
-  const promise = messages.send(message, { target, async: true })
-  chrome.runtime.sendMessage.invokeCallback(coreResponse)
+  chrome.runtime.sendMessage.mockImplementation(
+    (m: any, sendResponse?: (respond: any) => void) => {
+      sendResponse?.(coreResponse)
+    },
+  )
 
-  const result = await promise
+  const result = await messages.send(message, { async: true })
 
   expect(result).toEqual(response)
 })
@@ -150,8 +76,6 @@ test('rejects if success === false', async () => {
   expect.assertions(2)
 
   const message = { greeting: 'hello' }
-  const target: TargetName = 'background'
-
   const response = {
     greeting: 'should not resolve',
   }
@@ -160,11 +84,14 @@ test('rejects if success === false', async () => {
     success: false,
   }
 
-  const promise = messages.send(message, { target, async: true })
-  chrome.runtime.sendMessage.invokeCallback(coreResponse)
+  chrome.runtime.sendMessage.mockImplementation(
+    (m: any, sendResponse?: (respond: any) => void) => {
+      sendResponse?.(coreResponse)
+    },
+  )
 
   try {
-    await promise
+    await messages.send(message, { async: true })
   } catch (error) {
     expect(error).toBeInstanceOf(Error)
     expect(error.message).toBe(response.greeting)
@@ -175,16 +102,13 @@ test('rejects if runtime.lastError', async () => {
   expect.assertions(2)
 
   const message = { greeting: 'hello' }
-  const target: TargetName = 'background'
-  lastError = { message: 'should not resolve' }
-
-  const result = messages.send(message, { target, async: true })
-  chrome.runtime.sendMessage.invokeCallback()
+  lastErrorMessage = 'should reject'
+  chrome.runtime.lastError = lastError
 
   try {
-    await result
+    await messages.send(message, { async: true })
   } catch (error) {
     expect(lastErrorSpy).toBeCalled()
-    expect(error.message).toBe(lastError.message)
+    expect(error.message).toBe(lastErrorMessage)
   }
 })
