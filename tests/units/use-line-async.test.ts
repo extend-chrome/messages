@@ -1,5 +1,5 @@
-import { Observable } from 'rxjs'
-import * as chrome from 'sinon-chrome'
+import { chrome } from '@bumble/jest-chrome'
+import { Observable, Subscription } from 'rxjs'
 import { _listeners } from '../../src/ListenerMap'
 import { useScope } from '../../src/scope'
 import { CoreMessage } from '../../src/types'
@@ -13,9 +13,14 @@ const line = messages.useLine<string, number>(greeting, {
 })
 const [send, stream] = line
 
+let subscription: Subscription | undefined
+
 afterEach(() => {
-  chrome.reset()
   _listeners.clear()
+  jest.clearAllMocks()
+
+  subscription && subscription.unsubscribe()
+  subscription = undefined
 })
 
 test('returns correct tuple', () => {
@@ -39,28 +44,26 @@ test('sends correct message', () => {
 
   send(data)
 
-  expect(
-    chrome.runtime.sendMessage.firstCall.args[0],
-  ).toMatchObject({
-    async: true,
-    payload: {
-      greeting,
-      data,
-    },
-  })
+  expect(chrome.runtime.sendMessage).toBeCalledWith(
+    expect.objectContaining({
+      async: true,
+      payload: {
+        greeting,
+        data,
+      },
+    }),
+    expect.any(Function),
+  )
 })
 
 test('subscribes to onMessage event', () => {
   expect(_listeners.size).toBe(0)
-  stream.subscribe()
+  subscription = stream.subscribe()
   expect(_listeners.size).toBe(1)
 
   const listeners = _listeners.get(scope)
   if (listeners) {
     expect(listeners.size).toBe(2)
-    expect(chrome.runtime.onMessage.addListener.called).toBe(
-      true,
-    )
   } else {
     expect(listeners).toBeDefined()
   }
@@ -73,16 +76,16 @@ test('emits correct message', (done) => {
   const message: CoreMessage = {
     async: true,
     scope: scope,
-    target: null,
+    tabId: null,
     payload: {
       greeting,
       data,
     },
   }
-  const sender = { id: 123 }
+  const sender = {}
   const respond = jest.fn()
 
-  stream.subscribe((tuple) => {
+  subscription = stream.subscribe((tuple) => {
     expect(tuple).toBeInstanceOf(Array)
     expect(tuple.length).toBe(3)
 
@@ -99,29 +102,30 @@ test('emits correct message', (done) => {
     done()
   })
 
-  chrome.runtime.onMessage.trigger(message, sender, respond)
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 })
 
-test('ignores wrong message', (done) => {
+test('ignores message for other scope', (done) => {
   expect.assertions(0)
 
   const data = { abc: 'xyz' }
-  const sender = { id: 123 }
   const message: CoreMessage = {
     async: false,
-    scope: scope,
-    target: null,
+    scope: 'other scope',
+    tabId: null,
     payload: {
       greeting: 'other',
       data,
     },
   }
+  const sender = {}
+  const sendResponse = jest.fn()
 
-  stream.subscribe(() => {
+  subscription = stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.trigger(message, sender)
+  chrome.runtime.onMessage.callListeners(message, sender, sendResponse)
 
   setTimeout(() => {
     done()
@@ -131,19 +135,20 @@ test('ignores wrong message', (done) => {
 test('ignores primitive message', (done) => {
   expect.assertions(0)
 
-  const sender = { id: 123 }
   const message: CoreMessage = {
     async: false,
     scope: scope,
-    target: null,
+    tabId: null,
     payload: 123,
   }
+  const sender = {}
+  const sendResponse = jest.fn()
 
-  stream.subscribe(() => {
+  subscription = stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.trigger(message, sender)
+  chrome.runtime.onMessage.callListeners(message, sender, sendResponse)
 
   setTimeout(() => {
     done()
@@ -153,19 +158,20 @@ test('ignores primitive message', (done) => {
 test('ignores null message', (done) => {
   expect.assertions(0)
 
-  const sender = { id: 123 }
   const message: CoreMessage = {
     async: false,
     scope: scope,
-    target: null,
+    tabId: null,
     payload: null,
   }
+  const sender = {}
+  const sendResponse = jest.fn()
 
-  stream.subscribe(() => {
+  subscription = stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.trigger(message, sender)
+  chrome.runtime.onMessage.callListeners(message, sender, sendResponse)
 
   setTimeout(() => {
     done()
@@ -175,19 +181,20 @@ test('ignores null message', (done) => {
 test('ignores undefined message', (done) => {
   expect.assertions(0)
 
-  const sender = { id: 123 }
   const message: CoreMessage = {
     async: false,
     scope: scope,
-    target: null,
+    tabId: null,
     payload: undefined,
   }
+  const sender = {}
+  const sendMessage = jest.fn()
 
-  stream.subscribe(() => {
+  subscription = stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.trigger(message, sender)
+  chrome.runtime.onMessage.callListeners(message, sender, sendMessage)
 
   setTimeout(() => {
     done()
@@ -201,16 +208,16 @@ test('respond function calls native respond', (done) => {
   const message: CoreMessage = {
     async: true,
     scope: scope,
-    target: null,
+    tabId: null,
     payload: {
       greeting,
       data,
     },
   }
-  const sender = { id: 123 }
+  const sender = {}
   const respond = jest.fn()
 
-  stream.subscribe(([d, s, _respond]) => {
+  subscription = stream.subscribe(([, , _respond]) => {
     expect(respond).not.toBeCalled()
 
     _respond(5)
@@ -220,5 +227,5 @@ test('respond function calls native respond', (done) => {
     done()
   })
 
-  chrome.runtime.onMessage.trigger(message, sender, respond)
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 })

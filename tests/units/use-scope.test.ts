@@ -1,15 +1,12 @@
+import { chrome } from '@bumble/jest-chrome'
+import { _listeners } from '../../src/ListenerMap'
 import { useScope } from '../../src/scope'
-
-import { _listeners, _getListener } from '../../src/ListenerMap'
-
-import * as chrome from 'sinon-chrome'
 import { CoreMessage } from '../../src/types'
 
 const scopeName = 'test scope'
 const messages = useScope(scopeName)
 
 afterEach(() => {
-  chrome.reset()
   _listeners.clear()
 })
 
@@ -30,16 +27,14 @@ test('emits correct message tuple', (done) => {
   expect.assertions(4)
 
   const payload = { abc: 'xyz' }
-  const sender = { id: 123 }
+  const sender = {}
+  const sendResponse = jest.fn()
 
   messages.stream.subscribe((tuple) => {
     expect(tuple).toBeInstanceOf(Array)
     expect(tuple.length).toBe(2)
-
-    const [_payload, _sender] = tuple
-
-    expect(_payload).toBe(payload)
-    expect(_sender).toBe(sender)
+    expect(tuple[0]).toBe(payload)
+    expect(tuple[1]).toBe(sender)
 
     done()
   })
@@ -47,9 +42,9 @@ test('emits correct message tuple', (done) => {
   const message: CoreMessage = {
     async: false,
     scope: scopeName,
-    target: null,
     payload,
+    tabId: null,
   }
 
-  chrome.runtime.onMessage.trigger(message, sender)
+  chrome.runtime.onMessage.callListeners(message, sender, sendResponse)
 })

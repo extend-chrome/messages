@@ -2,24 +2,7 @@ import { fromEventPattern, merge, Observable } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import { scopeAsyncOn, scopeOff, scopeOn } from './events'
 import { scopeAsyncSend, scopeSend } from './send'
-import { AsyncMessageListener, MessageListener } from './types'
-
-/** The tab that sent the message */
-type Sender = chrome.runtime.MessageSender
-
-type SendOptions =
-  | {
-      target: string | number | undefined
-      tabId?: undefined
-    }
-  | {
-      target?: undefined
-      tabId: number
-    }
-
-type AsyncSendOptions = SendOptions & {
-  async: true
-}
+import { AsyncMessageListener, AsyncSendOptions, MessageListener, Sender, SendOptions } from './types'
 
 /**
  * Get a messages scope by name.
@@ -37,16 +20,10 @@ export function useScope(scope: string) {
    * @param [options.async] Set to true to receive a response.
    * @param [options.target] Either a tab id or a target name. Use to send to a tab or a specific listener.
    */
-  function send<T, R>(
-    data: T,
-    options: AsyncSendOptions,
-  ): Promise<R>
+  function send<T, R>(data: T, options: AsyncSendOptions): Promise<R>
   function send<T>(data: T, options: SendOptions): Promise<void>
   function send<T>(data: T): Promise<void>
-  async function send<T, R>(
-    data: T,
-    options?: SendOptions & { async?: true },
-  ) {
+  async function send<T, R>(data: T, options?: SendOptions & { async?: true }) {
     const _options: any = options || {}
     _options.target = _options.target || _options.tabId
     const { async = false, target } = _options
@@ -60,52 +37,30 @@ export function useScope(scope: string) {
 
   /** Listen for messages. */
   function on<T, R>(
-    callback: (
-      data: T,
-      sender: Sender,
-      respond: (data: R) => void,
-    ) => void,
-    target?: string,
+    callback: (data: T, sender: Sender, respond: (data: R) => void) => void,
   ): void
-  function on<T>(
-    callback: (data: T, sender: Sender) => void,
-    target?: string,
-  ): void
-  function on<T>(
-    callback: (data: T) => void,
-    target?: string,
-  ): void
-  function on(
-    callback: MessageListener | AsyncMessageListener,
-    target?: string | number,
-  ) {
+  function on<T>(callback: (data: T, sender: Sender) => void): void
+  function on(callback: MessageListener | AsyncMessageListener) {
     if (isMessageListener(callback)) {
-      _on(callback, target)
+      _on(callback)
     } else {
-      _asyncOn(callback, target)
+      _asyncOn(callback)
     }
 
-    function isMessageListener(
-      x: Function,
-    ): x is MessageListener {
+    function isMessageListener(x: Function): x is MessageListener {
       return x.length < 3
     }
   }
 
   /** Remove a message listener from `on`. */
-  function off(
-    fn: MessageListener | AsyncMessageListener,
-  ): void {
+  function off(fn: MessageListener | AsyncMessageListener): void {
     return _off(fn)
   }
 
   /** Untyped Observable of all messages in scope */
   const stream = merge(
     fromEventPattern<[any, Sender]>(_on, _off),
-    fromEventPattern<[any, Sender, (data: any) => void]>(
-      _asyncOn,
-      _off,
-    ),
+    fromEventPattern<[any, Sender, (data: any) => void]>(_asyncOn, _off),
   )
 
   const _greetings = new Set()
@@ -129,12 +84,8 @@ export function useScope(scope: string) {
     (data: T, options?: SendOptions) => Promise<void>,
     Observable<[T, Sender]>,
   ]
-  function useLine<T, R>(
-    greeting: string,
-    options?: { async: true },
-  ) {
-    if (_greetings.has(greeting))
-      throw new Error('greeting is not unique')
+  function useLine<T, R>(greeting: string, options?: { async: true }) {
+    if (_greetings.has(greeting)) throw new Error('greeting is not unique')
 
     _greetings.add(greeting)
 
@@ -146,24 +97,16 @@ export function useScope(scope: string) {
         data: T
       }
 
-      _options = _options || {} as SendOptions
-      let target: number | string | undefined
+      _options = _options || ({} as SendOptions)
+      let tabId: number | undefined
       if (typeof _options.tabId === 'number') {
-        target = _options.tabId
-      } else {
-        target = _options.target
+        tabId = _options.tabId
       }
 
       if (async) {
-        return send<LineMessage, R>(
-          { greeting, data },
-          {
-            async,
-            target,
-          },
-        )
+        return send<LineMessage, R>({ greeting, data }, { async, tabId })
       } else {
-        return send<LineMessage>({ greeting, data }, { target })
+        return send<LineMessage>({ greeting, data }, { tabId })
       }
     }
 
@@ -177,10 +120,7 @@ export function useScope(scope: string) {
         filter(isInLine),
         // Map message to data
         map(([{ data }, s, r]) => [data, s, r]),
-        filter(
-          (x): x is [T, Sender, (response: R) => void] =>
-            x.length === 3,
-        ),
+        filter((x): x is [T, Sender, (response: R) => void] => x.length === 3),
       )
 
       return [_send, _stream]
@@ -197,9 +137,7 @@ export function useScope(scope: string) {
     }
 
     function isInLine([x]: any[]) {
-      return (
-        x && typeof x === 'object' && x.greeting === greeting
-      )
+      return x && typeof x === 'object' && x.greeting === greeting
     }
   }
 

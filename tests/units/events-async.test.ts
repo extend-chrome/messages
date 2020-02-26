@@ -1,13 +1,8 @@
 import { chrome } from '@bumble/jest-chrome'
 import delay from 'delay'
-
 import { _getListener, _listeners } from '../../src/ListenerMap'
 import { useScope } from '../../src/scope'
-import {
-  AsyncMessageListener,
-  CoreMessage,
-  CoreResponse,
-} from '../../src/types'
+import { AsyncMessageListener, CoreMessage, CoreResponse } from '../../src/types'
 
 const scope = 'test'
 const messages = useScope(scope)
@@ -25,7 +20,7 @@ const message = {
 }
 const coreMessage: CoreMessage = {
   async: true,
-  target: null,
+  tabId: null,
   payload: message,
   scope,
 }
@@ -151,7 +146,7 @@ describe('message filtering', () => {
     const oneWayMessage: CoreMessage = {
       async: false,
       payload: message,
-      target: null,
+      tabId: null,
       scope,
     }
 
@@ -164,47 +159,11 @@ describe('message filtering', () => {
     expect(listener).not.toBeCalled()
   })
 
-  test('receives messages for own target name', () => {
-    const target = 'background'
-    const coreMessage: CoreMessage = {
-      async: true,
-      payload: message,
-      target: target,
-      scope,
-    }
-
-    const listener = jest.fn((m, s, r) => {})
-    const respondSpy = jest.fn()
-
-    messages.on(listener, target)
-    chrome.runtime.onMessage.callListeners(coreMessage, sender, respondSpy)
-
-    expect(listener).toBeCalled()
-  })
-
-  test('ignores messages for other targets', () => {
-    const target = 'background'
-    const coreMessage: CoreMessage = {
-      async: true,
-      payload: message,
-      target: 'options',
-      scope,
-    }
-
-    const listener = jest.fn((m, s, r) => {})
-    const respondSpy = jest.fn()
-
-    messages.on(listener)
-    chrome.runtime.onMessage.callListeners(coreMessage, sender, respondSpy)
-
-    expect(listener).not.toBeCalled()
-  })
-
   test('receives general messages if no target name', () => {
     const coreMessage: CoreMessage = {
       async: true,
       payload: message,
-      target: null,
+      tabId: null,
       scope,
     }
 
@@ -217,30 +176,12 @@ describe('message filtering', () => {
     expect(listener).toBeCalled()
   })
 
-  test('ignores targeted messages if no target name', () => {
-    const coreMessage: CoreMessage = {
-      async: true,
-      payload: message,
-      target: 'options',
-      scope,
-    }
-
-    const listener = jest.fn((m, s, r) => {})
-    const respondSpy = jest.fn()
-
-    messages.on(listener)
-    chrome.runtime.onMessage.callListeners(coreMessage, sender, respondSpy)
-
-    expect(listener).not.toBeCalled()
-  })
-
   test('ignores messages for other scopes', () => {
-    const target = 'background'
     const coreMessage: CoreMessage = {
       async: true,
       payload: message,
-      target: 'options',
       scope: 'other scope',
+      tabId: null,
     }
 
     const listener = jest.fn((m, s, r) => {})

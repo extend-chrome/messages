@@ -71,8 +71,7 @@ export const testAsyncSend = (message: any) =>
 /*            test in content scripts           */
 /* -------------------------------------------- */
 
-export const contentUrl =
-  'http://www.brainjar.com/java/host/test.html'
+export const contentUrl = 'http://www.brainjar.com/java/host/test.html'
 
 /* ------------- test send to tab ------------- */
 
@@ -82,12 +81,12 @@ export const testSendToTab = (message: any) => {
   console.time('sending message')
 
   return messages
-    .send(message, { target: id })
+    .send(message, { tabId: id })
     .then(() => {
       console.timeEnd('sending message')
       console.log(chrome.runtime.lastError)
     })
-    .catch(({ message }) => {
+    .catch(({ message }: { message: string }) => {
       console.error(message)
       throw `${message} id: ${id}`
     })
@@ -111,8 +110,8 @@ export const testAsyncSendToTab = (message: any) => {
   const id = (window as any).newTab.id
 
   return messages
-    .send(message, { async: true, target: id })
-    .catch(({ message }) => {
+    .send(message, { async: true, tabId: id })
+    .catch(({ message }: { message: string }) => {
       throw `${message} Tab id: ${id}`
     })
 }

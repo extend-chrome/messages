@@ -2,12 +2,12 @@ import { CoreMessage, CoreResponse } from './types'
 
 export const scopeSend = (scope: string) => (
   message: any,
-  target?: string | number,
+  tabId?: number,
 ): Promise<void> =>
   new Promise((resolve, reject) => {
     const coreMessage: CoreMessage = {
       async: false,
-      target: target || null,
+      tabId: tabId || null,
       payload: message,
       scope,
     }
@@ -32,8 +32,8 @@ export const scopeSend = (scope: string) => (
       }
     }
 
-    if (typeof target === 'number') {
-      chrome.tabs.sendMessage(target, coreMessage, callback)
+    if (typeof tabId === 'number') {
+      chrome.tabs.sendMessage(tabId, coreMessage, callback)
     } else {
       chrome.runtime.sendMessage(coreMessage, callback)
     }
@@ -41,12 +41,12 @@ export const scopeSend = (scope: string) => (
 
 export const scopeAsyncSend = (scope: string) => (
   message: any,
-  target?: string | number,
+  tabId?: number,
 ): Promise<any> =>
   new Promise((resolve, reject) => {
     const coreMessage: CoreMessage = {
       async: true,
-      target: target || null,
+      tabId: tabId || null,
       payload: message,
       scope,
     }
@@ -61,8 +61,8 @@ export const scopeAsyncSend = (scope: string) => (
       }
     }
 
-    if (typeof target === 'number') {
-      chrome.tabs.sendMessage(target, coreMessage, callback)
+    if (typeof tabId === 'number') {
+      chrome.tabs.sendMessage(tabId, coreMessage, callback)
     } else {
       chrome.runtime.sendMessage(coreMessage, callback)
     }

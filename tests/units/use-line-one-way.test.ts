@@ -1,5 +1,5 @@
+import { chrome } from '@bumble/jest-chrome'
 import { Observable } from 'rxjs'
-import * as chrome from 'sinon-chrome'
 import { _listeners } from '../../src/ListenerMap'
 import { useScope } from '../../src/scope'
 import { CoreMessage } from '../../src/types'
@@ -12,7 +12,6 @@ const line = messages.useLine(greeting)
 const [send, stream] = line
 
 afterEach(() => {
-  chrome.reset()
   _listeners.clear()
 })
 
@@ -37,15 +36,16 @@ test('sends correct message', () => {
 
   send(data)
 
-  expect(
-    chrome.runtime.sendMessage.firstCall.args[0],
-  ).toMatchObject({
-    async: false,
-    payload: {
-      greeting,
-      data,
-    },
-  })
+  expect(chrome.runtime.sendMessage).toBeCalledWith(
+    expect.objectContaining({
+      async: false,
+      payload: {
+        greeting,
+        data,
+      },
+    }),
+    expect.any(Function)
+  )
 })
 
 test('subscribes to onMessage event', () => {
@@ -56,9 +56,6 @@ test('subscribes to onMessage event', () => {
   const listeners = _listeners.get(scope)
   if (listeners) {
     expect(listeners.size).toBe(2)
-    expect(chrome.runtime.onMessage.addListener.called).toBe(
-      true,
-    )
   } else {
     expect(listeners).toBeDefined()
   }
@@ -71,13 +68,13 @@ test('emits correct message', (done) => {
   const message: CoreMessage = {
     async: false,
     scope: scope,
-    target: null,
+    tabId: null,
     payload: {
       greeting,
       data,
     },
   }
-  const sender = { id: 123 }
+  const sender = {}
   const respond = jest.fn()
 
   stream.subscribe((tuple) => {
@@ -92,7 +89,7 @@ test('emits correct message', (done) => {
     done()
   })
 
-  chrome.runtime.onMessage.trigger(message, sender, respond)
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 })
 
 test('ignores wrong message', (done) => {
@@ -102,20 +99,20 @@ test('ignores wrong message', (done) => {
   const message: CoreMessage = {
     async: false,
     scope: scope,
-    target: null,
+    tabId: null,
     payload: {
       greeting: 'other',
       data,
     },
   }
-  const sender = { id: 123 }
+  const sender = {}
   const respond = jest.fn()
 
   stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.trigger(message, sender, respond)
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 
   setTimeout(() => {
     done()
@@ -128,17 +125,17 @@ test('ignores primitive message', (done) => {
   const message: CoreMessage = {
     async: false,
     scope: scope,
-    target: null,
+    tabId: null,
     payload: 15,
   }
-  const sender = { id: 123 }
+  const sender = {}
   const respond = jest.fn()
 
   stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.trigger(message, sender, respond)
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 
   setTimeout(() => {
     done()
@@ -151,17 +148,17 @@ test('ignores null message', (done) => {
   const message: CoreMessage = {
     async: false,
     scope: scope,
-    target: null,
+    tabId: null,
     payload: null,
   }
-  const sender = { id: 123 }
+  const sender = {}
   const respond = jest.fn()
 
   stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.trigger(message, sender, respond)
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 
   setTimeout(() => {
     done()
@@ -174,17 +171,17 @@ test('ignores undefined message', (done) => {
   const message: CoreMessage = {
     async: false,
     scope: scope,
-    target: null,
+    tabId: null,
     payload: undefined,
   }
-  const sender = { id: 123 }
+  const sender = {}
   const respond = jest.fn()
 
   stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.trigger(message, sender, respond)
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 
   setTimeout(() => {
     done()

@@ -23,6 +23,7 @@ test('sends async CoreMessage to runtime', () => {
     async: true,
     payload,
     scope,
+    tabId: null,
   }
 
   messages.send(payload, { async: true })
@@ -41,6 +42,7 @@ test('sends async CoreMessage to tab', () => {
     async: true,
     payload,
     scope,
+    tabId,
   }
 
   messages.send(payload, { tabId, async: true })

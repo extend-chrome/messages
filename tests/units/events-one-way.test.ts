@@ -15,6 +15,7 @@ const coreMessage: CoreMessage = {
   async: false,
   payload,
   scope,
+  tabId: null,
 }
 
 const sender = {} // Not used directly by @bumble/messages
@@ -90,6 +91,7 @@ describe('filtering', () => {
       async: true,
       payload: payload,
       scope,
+      tabId: null,
     }
 
     const listener = jest.fn()
@@ -105,6 +107,7 @@ describe('filtering', () => {
       async: false,
       payload: payload,
       scope: 'another scope',
+      tabId: null,
     }
 
     const listener = jest.fn()

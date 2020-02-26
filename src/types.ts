@@ -1,17 +1,4 @@
 /**
- * Designate the extension script to receive the message.
- *
- * Can be a default frame name ("background", "options", or "popup"),
- * a custom frame name, or a content script tab id.
- */
-export type TargetName =
-  | 'background'
-  | 'popup'
-  | 'options'
-  | number
-  | string
-
-/**
  * Private interface.
  *
  * Use to send a message to another script through a port.
@@ -19,7 +6,7 @@ export type TargetName =
  */
 export interface CoreMessage {
   async: boolean
-  target: TargetName | null
+  tabId: number | null
   payload: any
   scope: string
 }
@@ -58,4 +45,15 @@ export interface CoreListener {
     sender: chrome.runtime.MessageSender,
     sendResponse: (response?: any) => void,
   ): void
+}
+
+/** The tab that sent the message */
+export type Sender = chrome.runtime.MessageSender
+
+export type SendOptions = {
+  tabId?: number
+}
+
+export type AsyncSendOptions = SendOptions & {
+  async: true
 }
