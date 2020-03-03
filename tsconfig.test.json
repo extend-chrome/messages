@@ -2,5 +2,5 @@
   "extends": "./tsconfig.json",
   "compilerOptions": { "noUnusedLocals": false },
   "include": ["src", "tests"],
-  "exclude": ["lib", "playground", "types"]
+  "exclude": ["lib", "playground", "types", "tests/e2e/extension-src"]
 }

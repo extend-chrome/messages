@@ -13,6 +13,6 @@
     "outDir": "lib"
   },
   "include": ["src", "tests", "jest.config.js"],
-  "exclude": ["lib", "playground", "types"],
+  "exclude": ["lib", "playground", "types", "tests/e2e/extension-src"],
   "typeAcquisition": { "enable": true }
 }
