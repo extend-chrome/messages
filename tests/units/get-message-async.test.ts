@@ -1,5 +1,5 @@
 import { chrome } from '@bumble/jest-chrome'
-import { Observable } from 'rxjs'
+import { Observable, Subscription } from 'rxjs'
 import { _listeners } from '../../src/ListenerMap'
 import { getScope } from '../../src/scope'
 import { CoreMessage } from '../../src/types'
@@ -8,27 +8,40 @@ const scope = 'test scope'
 const messages = getScope(scope)
 
 const greeting = 'test line'
-const line = messages.useLine(greeting)
-const [send, stream] = line
+const wrappedMessage = messages.getMessage<string, number>(greeting, {
+  async: true,
+})
+const [send, stream, waitFor] = wrappedMessage
+
+let subscription: Subscription | undefined
 
 afterEach(() => {
   _listeners.clear()
+  jest.clearAllMocks()
+
+  subscription && subscription.unsubscribe()
+  subscription = undefined
 })
 
 test('returns correct tuple', () => {
-  expect(line).toBeInstanceOf(Array)
-  expect(line.length).toBe(2)
-
-  const [send, stream] = line
-
-  expect(stream).toBeInstanceOf(Observable)
+  expect(wrappedMessage).toBeInstanceOf(Array)
+  expect(wrappedMessage.length).toBe(3)
 
   expect(send).toBeInstanceOf(Function)
   expect(send.length).toBe(2)
 
+  expect(send.toTab).toBeInstanceOf(Function)
+  expect(send.toTab.length).toBe(1)
+
   const sendResult = send('abc')
 
   expect(sendResult).toBeInstanceOf(Promise)
+
+  expect(stream).toBeInstanceOf(Observable)
+
+  expect(waitFor).toBeInstanceOf(Function)
+  expect(waitFor()).toBeInstanceOf(Promise)
+  expect(waitFor(() => true)).toBeInstanceOf(Promise)
 })
 
 test('sends correct message', () => {
@@ -38,19 +51,19 @@ test('sends correct message', () => {
 
   expect(chrome.runtime.sendMessage).toBeCalledWith(
     expect.objectContaining({
-      async: false,
+      async: true,
       payload: {
         greeting,
         data,
       },
     }),
-    expect.any(Function)
+    expect.any(Function),
   )
 })
 
 test('subscribes to onMessage event', () => {
   expect(_listeners.size).toBe(0)
-  stream.subscribe()
+  subscription = stream.subscribe()
   expect(_listeners.size).toBe(1)
 
   const listeners = _listeners.get(scope)
@@ -62,11 +75,11 @@ test('subscribes to onMessage event', () => {
 })
 
 test('emits correct message', (done) => {
-  expect.assertions(4)
+  expect.assertions(7)
 
   const data = { abc: 'xyz' }
   const message: CoreMessage = {
-    async: false,
+    async: true,
     scope: scope,
     tabId: null,
     payload: {
@@ -77,14 +90,19 @@ test('emits correct message', (done) => {
   const sender = {}
   const respond = jest.fn()
 
-  stream.subscribe((tuple) => {
+  subscription = stream.subscribe((tuple) => {
     expect(tuple).toBeInstanceOf(Array)
-    expect(tuple.length).toBe(2)
+    expect(tuple.length).toBe(3)
 
-    const [_data, _sender] = tuple
+    const [_data, _sender, _respond] = tuple
 
     expect(_data).toBe(data)
     expect(_sender).toBe(sender)
+    expect(_respond).toBeInstanceOf(Function)
+
+    expect(respond).not.toBeCalled()
+    _respond(5)
+    expect(respond).toBeCalled()
 
     done()
   })
@@ -92,13 +110,13 @@ test('emits correct message', (done) => {
   chrome.runtime.onMessage.callListeners(message, sender, respond)
 })
 
-test('ignores wrong message', (done) => {
+test('ignores message for other scope', (done) => {
   expect.assertions(0)
 
   const data = { abc: 'xyz' }
   const message: CoreMessage = {
     async: false,
-    scope: scope,
+    scope: 'other scope',
     tabId: null,
     payload: {
       greeting: 'other',
@@ -106,17 +124,17 @@ test('ignores wrong message', (done) => {
     },
   }
   const sender = {}
-  const respond = jest.fn()
+  const sendResponse = jest.fn()
 
-  stream.subscribe(() => {
+  subscription = stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.callListeners(message, sender, respond)
+  chrome.runtime.onMessage.callListeners(message, sender, sendResponse)
 
   setTimeout(() => {
     done()
-  }, 1500)
+  }, 500)
 })
 
 test('ignores primitive message', (done) => {
@@ -126,20 +144,20 @@ test('ignores primitive message', (done) => {
     async: false,
     scope: scope,
     tabId: null,
-    payload: 15,
+    payload: 123,
   }
   const sender = {}
-  const respond = jest.fn()
+  const sendResponse = jest.fn()
 
-  stream.subscribe(() => {
+  subscription = stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.callListeners(message, sender, respond)
+  chrome.runtime.onMessage.callListeners(message, sender, sendResponse)
 
   setTimeout(() => {
     done()
-  }, 1500)
+  }, 500)
 })
 
 test('ignores null message', (done) => {
@@ -152,17 +170,17 @@ test('ignores null message', (done) => {
     payload: null,
   }
   const sender = {}
-  const respond = jest.fn()
+  const sendResponse = jest.fn()
 
-  stream.subscribe(() => {
+  subscription = stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.callListeners(message, sender, respond)
+  chrome.runtime.onMessage.callListeners(message, sender, sendResponse)
 
   setTimeout(() => {
     done()
-  }, 1500)
+  }, 500)
 })
 
 test('ignores undefined message', (done) => {
@@ -175,15 +193,44 @@ test('ignores undefined message', (done) => {
     payload: undefined,
   }
   const sender = {}
-  const respond = jest.fn()
+  const sendMessage = jest.fn()
 
-  stream.subscribe(() => {
+  subscription = stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.callListeners(message, sender, respond)
+  chrome.runtime.onMessage.callListeners(message, sender, sendMessage)
 
   setTimeout(() => {
     done()
-  }, 1500)
+  }, 500)
+})
+
+test('respond function calls native respond', (done) => {
+  expect.assertions(2)
+
+  const data = { abc: 'xyz' }
+  const message: CoreMessage = {
+    async: true,
+    scope: scope,
+    tabId: null,
+    payload: {
+      greeting,
+      data,
+    },
+  }
+  const sender = {}
+  const respond = jest.fn()
+
+  subscription = stream.subscribe(([, , _respond]) => {
+    expect(respond).not.toBeCalled()
+
+    _respond(5)
+
+    expect(respond).toBeCalled()
+
+    done()
+  })
+
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 })

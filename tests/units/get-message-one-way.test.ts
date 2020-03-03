@@ -1,5 +1,5 @@
 import { chrome } from '@bumble/jest-chrome'
-import { Observable, Subscription } from 'rxjs'
+import { Observable } from 'rxjs'
 import { _listeners } from '../../src/ListenerMap'
 import { getScope } from '../../src/scope'
 import { CoreMessage } from '../../src/types'
@@ -8,35 +8,32 @@ const scope = 'test scope'
 const messages = getScope(scope)
 
 const greeting = 'test line'
-const line = messages.useLine<string, number>(greeting, {
-  async: true,
-})
-const [send, stream] = line
-
-let subscription: Subscription | undefined
+const wrappedMessage = messages.getMessage(greeting)
+const [send, stream, waitFor] = wrappedMessage
 
 afterEach(() => {
   _listeners.clear()
-  jest.clearAllMocks()
-
-  subscription && subscription.unsubscribe()
-  subscription = undefined
 })
 
 test('returns correct tuple', () => {
-  expect(line).toBeInstanceOf(Array)
-  expect(line.length).toBe(2)
-
-  const [send, stream] = line
-
-  expect(stream).toBeInstanceOf(Observable)
+  expect(wrappedMessage).toBeInstanceOf(Array)
+  expect(wrappedMessage.length).toBe(3)
 
   expect(send).toBeInstanceOf(Function)
   expect(send.length).toBe(2)
-
+  
+  expect(send.toTab).toBeInstanceOf(Function)
+  expect(send.toTab.length).toBe(1)
+  
   const sendResult = send('abc')
-
+  
   expect(sendResult).toBeInstanceOf(Promise)
+
+  expect(stream).toBeInstanceOf(Observable)
+
+  expect(waitFor).toBeInstanceOf(Function)
+  expect(waitFor()).toBeInstanceOf(Promise)
+  expect(waitFor(() => true)).toBeInstanceOf(Promise)
 })
 
 test('sends correct message', () => {
@@ -46,19 +43,19 @@ test('sends correct message', () => {
 
   expect(chrome.runtime.sendMessage).toBeCalledWith(
     expect.objectContaining({
-      async: true,
+      async: false,
       payload: {
         greeting,
         data,
       },
     }),
-    expect.any(Function),
+    expect.any(Function)
   )
 })
 
 test('subscribes to onMessage event', () => {
   expect(_listeners.size).toBe(0)
-  subscription = stream.subscribe()
+  stream.subscribe()
   expect(_listeners.size).toBe(1)
 
   const listeners = _listeners.get(scope)
@@ -70,11 +67,11 @@ test('subscribes to onMessage event', () => {
 })
 
 test('emits correct message', (done) => {
-  expect.assertions(7)
+  expect.assertions(4)
 
   const data = { abc: 'xyz' }
   const message: CoreMessage = {
-    async: true,
+    async: false,
     scope: scope,
     tabId: null,
     payload: {
@@ -85,19 +82,14 @@ test('emits correct message', (done) => {
   const sender = {}
   const respond = jest.fn()
 
-  subscription = stream.subscribe((tuple) => {
+  stream.subscribe((tuple) => {
     expect(tuple).toBeInstanceOf(Array)
-    expect(tuple.length).toBe(3)
+    expect(tuple.length).toBe(2)
 
-    const [_data, _sender, _respond] = tuple
+    const [_data, _sender] = tuple
 
     expect(_data).toBe(data)
     expect(_sender).toBe(sender)
-    expect(_respond).toBeInstanceOf(Function)
-
-    expect(respond).not.toBeCalled()
-    _respond(5)
-    expect(respond).toBeCalled()
 
     done()
   })
@@ -105,13 +97,13 @@ test('emits correct message', (done) => {
   chrome.runtime.onMessage.callListeners(message, sender, respond)
 })
 
-test('ignores message for other scope', (done) => {
+test('ignores wrong message', (done) => {
   expect.assertions(0)
 
   const data = { abc: 'xyz' }
   const message: CoreMessage = {
     async: false,
-    scope: 'other scope',
+    scope: scope,
     tabId: null,
     payload: {
       greeting: 'other',
@@ -119,17 +111,17 @@ test('ignores message for other scope', (done) => {
     },
   }
   const sender = {}
-  const sendResponse = jest.fn()
+  const respond = jest.fn()
 
-  subscription = stream.subscribe(() => {
+  stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.callListeners(message, sender, sendResponse)
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 
   setTimeout(() => {
     done()
-  }, 500)
+  }, 1500)
 })
 
 test('ignores primitive message', (done) => {
@@ -139,20 +131,20 @@ test('ignores primitive message', (done) => {
     async: false,
     scope: scope,
     tabId: null,
-    payload: 123,
+    payload: 15,
   }
   const sender = {}
-  const sendResponse = jest.fn()
+  const respond = jest.fn()
 
-  subscription = stream.subscribe(() => {
+  stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.callListeners(message, sender, sendResponse)
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 
   setTimeout(() => {
     done()
-  }, 500)
+  }, 1500)
 })
 
 test('ignores null message', (done) => {
@@ -165,17 +157,17 @@ test('ignores null message', (done) => {
     payload: null,
   }
   const sender = {}
-  const sendResponse = jest.fn()
+  const respond = jest.fn()
 
-  subscription = stream.subscribe(() => {
+  stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.callListeners(message, sender, sendResponse)
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 
   setTimeout(() => {
     done()
-  }, 500)
+  }, 1500)
 })
 
 test('ignores undefined message', (done) => {
@@ -188,44 +180,15 @@ test('ignores undefined message', (done) => {
     payload: undefined,
   }
   const sender = {}
-  const sendMessage = jest.fn()
+  const respond = jest.fn()
 
-  subscription = stream.subscribe(() => {
+  stream.subscribe(() => {
     done.fail()
   })
 
-  chrome.runtime.onMessage.callListeners(message, sender, sendMessage)
+  chrome.runtime.onMessage.callListeners(message, sender, respond)
 
   setTimeout(() => {
     done()
-  }, 500)
-})
-
-test('respond function calls native respond', (done) => {
-  expect.assertions(2)
-
-  const data = { abc: 'xyz' }
-  const message: CoreMessage = {
-    async: true,
-    scope: scope,
-    tabId: null,
-    payload: {
-      greeting,
-      data,
-    },
-  }
-  const sender = {}
-  const respond = jest.fn()
-
-  subscription = stream.subscribe(([, , _respond]) => {
-    expect(respond).not.toBeCalled()
-
-    _respond(5)
-
-    expect(respond).toBeCalled()
-
-    done()
-  })
-
-  chrome.runtime.onMessage.callListeners(message, sender, respond)
+  }, 1500)
 })

@@ -3,6 +3,7 @@ import { filter, map } from 'rxjs/operators'
 import { scopeAsyncOn, scopeOff, scopeOn } from './events'
 import { scopeAsyncSend, scopeSend } from './send'
 import { AsyncMessageListener, AsyncSendOptions, MessageListener, Sender, SendOptions } from './types'
+import { setupWaitForFirst } from './waitForFirst'
 
 /**
  * Get a messages scope by name.
@@ -81,14 +82,20 @@ export function getScope(scope: string) {
     greeting: string,
     options: { async: true },
   ): [
-    (data: T, options?: SendOptions) => Promise<R>,
+    ((data: T, options?: SendOptions) => Promise<R>) & {
+      toTab: (options?: SendOptions) => Promise<R>
+    },
     Observable<[T, Sender, (response: R) => void]>,
+    (predicate?: (x: T) => boolean) => Promise<T>,
   ]
   function getMessage<T>(
     greeting: string,
   ): [
-    (data: T, options?: SendOptions) => Promise<void>,
+    ((data: T, options?: SendOptions) => Promise<void>) & {
+      toTab: (options?: SendOptions) => Promise<void>
+    },
     Observable<[T, Sender]>,
+    (predicate?: (x: T) => boolean) => Promise<T>,
   ]
   function getMessage<T, R>(greeting: string, options?: { async: true }) {
     if (_greetings.has(greeting)) throw new Error('greeting is not unique')
@@ -116,7 +123,19 @@ export function getScope(scope: string) {
       }
     }
 
+    /** Use this to send a message with no data to a tab */
+    _send.toTab = ({ tabId }: { tabId: number }) => {
+      interface WrappedMessage {
+        greeting: string
+      }
+
+      if (async) {
         return send<WrappedMessage, R>({ greeting }, { async, tabId })
+      } else {
+        return send<WrappedMessage>({ greeting }, { tabId })
+      }
+    }
+
     if (async) {
       const _stream: Observable<[
         T,
@@ -130,7 +149,7 @@ export function getScope(scope: string) {
         filter((x): x is [T, Sender, (response: R) => void] => x.length === 3),
       )
 
-      return [_send, _stream]
+      return [_send, _stream, setupWaitForFirst(stream)]
     } else {
       const _stream: Observable<[T, Sender]> = stream.pipe(
         // Filter line messages
@@ -140,7 +159,7 @@ export function getScope(scope: string) {
         filter((x): x is [T, Sender] => x.length < 3),
       )
 
-      return [_send, _stream]
+      return [_send, _stream, setupWaitForFirst(_stream)]
     }
 
     function isMatchingMessage([x]: any[]) {

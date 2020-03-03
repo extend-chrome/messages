@@ -1,24 +1,22 @@
 import {
   messages,
-  // getLine,
-  // useLine,
+  getMessage,
   __defaultScopeName,
-  useScope,
+  getScope,
 } from '../lib/index.esm'
 import { Observable } from 'rxjs'
 
 test('build includes all exports', () => {
   expect(__defaultScopeName).toBe('@bumble/messages__root')
-  expect(useScope).toBeInstanceOf(Function)
+  expect(getScope).toBeInstanceOf(Function)
 
   expect(messages).toMatchObject({
     send: expect.any(Function),
     on: expect.any(Function),
     off: expect.any(Function),
     stream: expect.any(Observable),
-    useLine: expect.any(Function),
+    getMessage: expect.any(Function),
   })
 
-  // expect(useLine).toBe(messages.getLine)
-  // expect(getLine).toBe(messages.getLine)
+  expect(getMessage).toBe(messages.getMessage)
 })
