@@ -1,3 +1,4 @@
 /node_modules
 /lib
 /playground
+tests/e2e/extension-src/**/*.js

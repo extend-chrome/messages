@@ -1,4 +1,4 @@
-import * as tests from './tests.js'
+import * as tests from './tests'
 
 window.tests = tests
 

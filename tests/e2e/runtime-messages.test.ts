@@ -1,9 +1,7 @@
 import delay from 'delay'
 import { Browser, launch, Page, Target } from 'puppeteer'
-import { buildExtension, pathToExtension } from './extension-setup'
+import { pathToExtension } from './extension-setup'
 import { onMessage, sendMessage } from './test-utils'
-
-const { options } = require('./extension-src/rollup.config')
 
 let browser: Browser | undefined
 let backgroundTarget: Target
@@ -11,13 +9,7 @@ let optionsTarget: Target
 let backgroundPage: Page
 let optionsPage: Page
 
-options.output.dir = pathToExtension
-
 beforeAll(async () => {
-  await buildExtension(options)
-
-  await delay(500)
-
   browser = await launch({
     headless: false,
     args: [

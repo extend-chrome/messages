@@ -1,4 +1,4 @@
-import * as tests from './tests.js'
+import * as tests from './tests'
 import chromep from 'chrome-promise'
 
 window.tests = tests
