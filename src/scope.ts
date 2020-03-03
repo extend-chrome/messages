@@ -14,6 +14,8 @@ export function getScope(scope: string) {
   const _on = scopeOn(scope)
   const _send = scopeSend(scope)
 
+  /* ---------------------- SEND --------------------- */
+
   /**
    * Send a message. Options are optional.
    *
@@ -34,6 +36,8 @@ export function getScope(scope: string) {
       return _send(data, target)
     }
   }
+
+  /* -------------------- RECEIVE -------------------- */
 
   /** Listen for messages. */
   function on<T, R>(
@@ -63,6 +67,8 @@ export function getScope(scope: string) {
     fromEventPattern<[any, Sender, (data: any) => void]>(_asyncOn, _off),
   )
 
+  /* ------------------ GET MESSAGE ----------------- */
+
   const _greetings = new Set()
 
   /**
@@ -71,20 +77,20 @@ export function getScope(scope: string) {
    * @param greeting Unique id for message
    * @param options.async Set true to send a response from the Observable
    */
-  function useLine<T, R>(
+  function getMessage<T, R>(
     greeting: string,
     options: { async: true },
   ): [
     (data: T, options?: SendOptions) => Promise<R>,
     Observable<[T, Sender, (response: R) => void]>,
   ]
-  function useLine<T>(
+  function getMessage<T>(
     greeting: string,
   ): [
     (data: T, options?: SendOptions) => Promise<void>,
     Observable<[T, Sender]>,
   ]
-  function useLine<T, R>(greeting: string, options?: { async: true }) {
+  function getMessage<T, R>(greeting: string, options?: { async: true }) {
     if (_greetings.has(greeting)) throw new Error('greeting is not unique')
 
     _greetings.add(greeting)
@@ -92,7 +98,7 @@ export function getScope(scope: string) {
     const { async } = options || {}
 
     const _send = (data: T, _options?: SendOptions) => {
-      interface LineMessage {
+      interface WrappedMessage {
         greeting: string
         data: T
       }
@@ -104,9 +110,9 @@ export function getScope(scope: string) {
       }
 
       if (async) {
-        return send<LineMessage, R>({ greeting, data }, { async, tabId })
+        return send<WrappedMessage, R>({ greeting, data }, { async, tabId })
       } else {
-        return send<LineMessage>({ greeting, data }, { tabId })
+        return send<WrappedMessage>({ greeting, data }, { tabId })
       }
     }
 
@@ -117,7 +123,7 @@ export function getScope(scope: string) {
         (response: R) => void,
       ]> = stream.pipe(
         // Filter line messages
-        filter(isInLine),
+        filter(isMatchingMessage),
         // Map message to data
         map(([{ data }, s, r]) => [data, s, r]),
         filter((x): x is [T, Sender, (response: R) => void] => x.length === 3),
@@ -127,7 +133,7 @@ export function getScope(scope: string) {
     } else {
       const _stream: Observable<[T, Sender]> = stream.pipe(
         // Filter line messages
-        filter(isInLine),
+        filter(isMatchingMessage),
         // Map message to data
         map(([{ data }, s]) => [data, s]),
         filter((x): x is [T, Sender] => x.length < 3),
@@ -136,7 +142,7 @@ export function getScope(scope: string) {
       return [_send, _stream]
     }
 
-    function isInLine([x]: any[]) {
+    function isMatchingMessage([x]: any[]) {
       return x && typeof x === 'object' && x.greeting === greeting
     }
   }
@@ -146,6 +152,6 @@ export function getScope(scope: string) {
     on,
     off,
     stream,
-    useLine,
+    getMessage,
   }
 }
