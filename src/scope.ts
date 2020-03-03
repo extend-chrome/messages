@@ -116,6 +116,7 @@ export function getScope(scope: string) {
       }
     }
 
+        return send<WrappedMessage, R>({ greeting }, { async, tabId })
     if (async) {
       const _stream: Observable<[
         T,
