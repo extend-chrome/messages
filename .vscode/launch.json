@@ -7,53 +7,13 @@
 
     {
       "type": "node",
-      "name": "vscode-jest-tests",
+      "name": "debug-file",
       "request": "launch",
-      "args": ["--runInBand"],
+      "args": ["${file}"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest"
     },
-    {
-      "type": "node",
-      "name": "test-api-node-style",
-      "request": "launch",
-      "args": ["--runInBand", "api-node-style"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
-    },
-    {
-      "type": "node",
-      "name": "test-send",
-      "request": "launch",
-      "args": ["--runInBand", "send"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
-    },
-    {
-      "type": "node",
-      "name": "test-events",
-      "request": "launch",
-      "args": ["--runInBand", "events"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
-    },
-    {
-      "type": "node",
-      "name": "test-api",
-      "request": "launch",
-      "args": ["--runInBand", "api"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
-    }
   ]
 }
