@@ -34,8 +34,7 @@ https://imgur.com/cKFLQ0o.png
 An API for Chrome extension messaging that makes sense. Uses Promises and
 Observables for convenience.
 
-> This library is in beta until version 1.0.0. The API may change between minor
-> versions.
+> This README is outdated, please refer to Intellisense for now. Updates coming soon.
 
 ## Table of Contents
 
