@@ -1,10 +1,10 @@
 import { chrome } from '@bumble/jest-chrome'
 import { _listeners } from '../../src/ListenerMap'
-import { useScope } from '../../src/scope'
+import { getScope } from '../../src/scope'
 import { CoreMessage } from '../../src/types'
 
 const scopeName = 'test scope'
-const messages = useScope(scopeName)
+const messages = getScope(scopeName)
 
 afterEach(() => {
   _listeners.clear()

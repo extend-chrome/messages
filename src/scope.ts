@@ -7,7 +7,7 @@ import { AsyncMessageListener, AsyncSendOptions, MessageListener, Sender, SendOp
 /**
  * Get a messages scope by name.
  */
-export function useScope(scope: string) {
+export function getScope(scope: string) {
   const _asyncOn = scopeAsyncOn(scope)
   const _asyncSend = scopeAsyncSend(scope)
   const _off = scopeOff(scope)

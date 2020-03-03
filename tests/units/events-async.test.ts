@@ -1,11 +1,11 @@
 import { chrome } from '@bumble/jest-chrome'
 import delay from 'delay'
 import { _getListener, _listeners } from '../../src/ListenerMap'
-import { useScope } from '../../src/scope'
+import { getScope } from '../../src/scope'
 import { AsyncMessageListener, CoreMessage, CoreResponse } from '../../src/types'
 
 const scope = 'test'
-const messages = useScope(scope)
+const messages = getScope(scope)
 
 console.error = jest.fn()
 

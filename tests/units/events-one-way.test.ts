@@ -1,12 +1,12 @@
 import { chrome } from '@bumble/jest-chrome'
 import { _getListener, _listeners } from '../../src/ListenerMap'
-import { useScope } from '../../src/scope'
+import { getScope } from '../../src/scope'
 import { CoreMessage, MessageListener } from '../../src/types'
 
 const addListenerSpy = jest.spyOn(chrome.runtime.onMessage, 'addListener')
 
 const scope = 'test'
-const messages = useScope(scope)
+const messages = getScope(scope)
 
 const payload = {
   greeting: 'hello',

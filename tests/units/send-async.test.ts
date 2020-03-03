@@ -1,9 +1,9 @@
 import { chrome } from '@bumble/jest-chrome'
-import { useScope } from '../../src/scope'
+import { getScope } from '../../src/scope'
 import { CoreMessage, CoreResponse } from '../../src/types'
 
 const scope = 'test'
-const messages = useScope(scope)
+const messages = getScope(scope)
 
 let lastErrorMessage: string
 const lastErrorSpy = jest.fn(() => lastErrorMessage)

@@ -1,11 +1,11 @@
 import { chrome } from '@bumble/jest-chrome'
 import { Observable } from 'rxjs'
 import { _listeners } from '../../src/ListenerMap'
-import { useScope } from '../../src/scope'
+import { getScope } from '../../src/scope'
 import { CoreMessage } from '../../src/types'
 
 const scope = 'test scope'
-const messages = useScope(scope)
+const messages = getScope(scope)
 
 const greeting = 'test line'
 const line = messages.useLine(greeting)
