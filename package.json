@@ -25,16 +25,14 @@
     "build:types": "tsc -p tsconfig.d.json",
     "build:watch": "npm run build:dev -- -w",
     "build:testExtension": "rm -rf tests/e2e/extension-build && rollup -c tests/e2e/extension-src/rollup.config.js",
-    "format": "run-s format:*",
-    "format:package": "sort-package-json && git add package.json",
-    "format:staged": "pretty-quick --staged",
-    "start": "run-p build:watch",
+    "start": "run-p build:watch test:watch",
     "test:e2e": "run-s build:testExtension && jest e2e",
     "test": "run-s test:quick test:e2e",
     "test:quick": "jest --testPathIgnorePatterns=e2e",
     "test:watch": "jest --testPathIgnorePatterns=e2e --watch",
     "preversion": "run-s test:quick",
-    "prepublish": "run-s build:pro build:types"
+    "prepublish": "run-s build:pro build:types",
+    "postpublish": "rm -rf node_modules package-lock.json && pnpm i"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.2",
