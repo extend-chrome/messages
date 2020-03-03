@@ -2,13 +2,14 @@
   "manifest_version": 2,
   "name": "messages-api-example",
   "version": "1.0.0",
+  "description": "An example of the Messages API",
   "background": {
     "scripts": ["background.js"],
     "persistent": false
   },
   "content_scripts": [
     {
-      "js": ["content.js"],
+      "js": ["content-script.js"],
       "matches": ["http://www.brainjar.com/java/host/test.html"]
     }
   ],

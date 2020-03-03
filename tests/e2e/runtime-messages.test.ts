@@ -1,26 +1,19 @@
-import * as path from 'path'
 import delay from 'delay'
-
-import { Browser, Target, Page, launch } from 'puppeteer'
-
-import { buildExtension } from './extension-setup'
+import { Browser, launch, Page, Target } from 'puppeteer'
+import { buildExtension, pathToExtension } from './extension-setup'
 import { onMessage, sendMessage } from './test-utils'
+
 const { options } = require('./extension-src/rollup.config')
 
-let browser: Browser
+let browser: Browser | undefined
 let backgroundTarget: Target
 let optionsTarget: Target
 let backgroundPage: Page
 let optionsPage: Page
 
-const pathToExtension = path.join(__dirname, 'extension-build')
 options.output.dir = pathToExtension
 
 beforeAll(async () => {
-  await buildExtension(options)
-})
-
-beforeEach(async () => {
   await buildExtension(options)
 
   await delay(500)
@@ -45,14 +38,14 @@ beforeEach(async () => {
 
   backgroundPage = await backgroundTarget.page()
   optionsPage = await optionsTarget.page()
-})
+}, 30000)
 
-afterEach(async () => {
-  await browser.close()
+afterAll(async () => {
+  await browser?.close()
 })
 
 describe('chrome.runtime', () => {
-  test('basic messaging', async () => {
+  test('basic runtime messaging', async () => {
     const message = { greeting: 'message' }
     const response = { greeting: 'response' }
 
@@ -72,10 +65,7 @@ describe('chrome.runtime', () => {
 
 describe('chrome.tabs', () => {
   test.todo('basic messaging')
-
   test.todo('multiple listeners, one response')
   test.todo('multiple listeners, no response')
   test.todo('multiple listeners, two responses')
 })
-
-

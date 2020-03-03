@@ -1,20 +1,16 @@
-import * as path from 'path'
 import delay from 'delay'
-
-import { Browser, Target, Page, launch } from 'puppeteer'
-
+import { Browser, launch, Page, Target } from 'puppeteer'
+import { buildExtension, pathToExtension } from './extension-setup'
 import * as tests from './extension-src/tests'
 
-import { buildExtension } from './extension-setup'
 const { options } = require('./extension-src/rollup.config')
 
-let browser: Browser
+let browser: Browser | undefined
 let backgroundTarget: Target
 let backgroundPage: Page
 let contentTarget: Target
 let contentPage: Page
 
-const pathToExtension = path.join(__dirname, 'extension-build')
 options.output.dir = pathToExtension
 
 beforeAll(async () => {
@@ -42,48 +38,42 @@ beforeAll(async () => {
 
   backgroundPage = await backgroundTarget.page()
   contentPage = await contentTarget.page()
-})
+}, 30000)
 
 afterAll(async () => {
-  await browser.close()
+  await browser?.close()
 })
 
-describe('content scripts', () => {
-  test('send to tab', async () => {
-    expect(contentPage).toBeDefined()
+test('send to tab', async () => {
+  const message = { greeting: 'message' }
 
-    const message = { greeting: 'message' }
-
-    let ctResults: string[] = []
-    contentPage.on('console', (consoleMessage) => {
-      ctResults.push(consoleMessage.text())
-    })
-
-    const bgResult = await backgroundPage.evaluate(
-      (m) => tests.testSendToTab(m),
-      message,
-    )
-
-    expect(bgResult).toBeUndefined()
-    expect(ctResults).toContain(message.greeting)
+  const ctResults: string[] = []
+  contentPage.on('console', (consoleMessage) => {
+    ctResults.push(consoleMessage.text())
   })
 
-  test('async send to tab', async () => {
-    expect(contentPage).toBeDefined()
+  const bgResult = await backgroundPage.evaluate(
+    (m) => tests.testSendToTab(m),
+    message,
+  )
 
-    const message = { greeting: 'message' }
+  expect(bgResult).toBeUndefined()
+  expect(ctResults).toContain(message.greeting)
+})
 
-    let ctResults: string[] = []
-    contentPage.on('console', (consoleMessage) => {
-      ctResults.push(consoleMessage.text())
-    })
+test('async send to tab', async () => {
+  const message = { greeting: 'message' }
 
-    const bgResult = await backgroundPage.evaluate(
-      (m) => tests.testAsyncSendToTab(m),
-      message,
-    )
-
-    expect(bgResult).toEqual(tests.contentResponse)
-    expect(ctResults).toContain(message.greeting)
+  const ctResults: string[] = []
+  contentPage.on('console', (consoleMessage) => {
+    ctResults.push(consoleMessage.text())
   })
+
+  const bgResult = await backgroundPage.evaluate(
+    (m) => tests.testAsyncSendToTab(m),
+    message,
+  )
+
+  expect(bgResult).toEqual(tests.contentResponse)
+  expect(ctResults).toContain(message.greeting)
 })
