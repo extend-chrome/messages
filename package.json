@@ -28,7 +28,6 @@
     "format": "run-s format:*",
     "format:package": "sort-package-json && git add package.json",
     "format:staged": "pretty-quick --staged",
-    "release": "git push && npm publish",
     "start": "run-p build:watch",
     "test": "npm run test:watch",
     "test:e2e": "npm run build:testExtension && jest e2e",
@@ -36,7 +35,7 @@
     "test:quick": "jest --testPathIgnorePatterns=e2e",
     "test:watch": "jest --testPathIgnorePatterns=e2e --watch",
     "preversion": "run-s test:quick",
-    "postversion": "run-s build:pro build:types release"
+    "prepublish": "run-s build:pro build:types"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.2",
