@@ -34,8 +34,6 @@ https://imgur.com/cKFLQ0o.png
 An API for Chrome extension messaging that makes sense. Uses Promises and
 Observables for convenience.
 
-> This README is outdated, please refer to Intellisense for now. Updates coming soon.
-
 ## Table of Contents
 
 - [Getting Started](#getting_started)
@@ -60,15 +58,15 @@ $ npm i @bumble/messages
 
 ## Usage <a name = "usage"></a>
 
-Send and receive messages using convenient Lines, or with a traditional messages
-object.
+Send and receive messages using isomorphic message wrappers, or with a
+traditional messages object.
 
 ```javascript
 // messages.js, used in both the background and content script
-import { useLine } from '@bumble/messages'
+import { getMessage } from '@bumble/messages'
 
-// useLine returns [function, Observable]
-export const [sendNumber, numberStream] = useLine(
+// getMessage returns [Function, Observable, Function]
+export const [sendNumber, numberStream, waitForNumber] = getMessage(
   // String to be used as a greeting
   'NUMBER',
 )
@@ -95,15 +93,15 @@ document.body.onclick = () => {
 }
 ```
 
-### Lines have great TypeScript support!
+### `getMessage` has great TypeScript support!
 
-If you're into TypeScript (you are, aren't you?), `useLine` is a generic
-function. It shines when you define the message data type. No more message data
-type mistakes! Intellisense has you covered.
+If you're into TypeScript, `getMessage` is a generic function. It shines when
+you define the message data type. No more message data type mistakes!
+Intellisense has you covered.
 
 ```typescript
 // messages.ts
-import { useLine } from '@bumble/messages'
+import { getMessage } from '@bumble/messages'
 
 interface Stats {
   hi: number
@@ -111,7 +109,11 @@ interface Stats {
   date: string
 }
 
-export const [sendStats, statsStream] = useLine<Stats>('STATS')
+export const [sendStats, statsStream, waitForStats] = getMessage<Stats>('STATS')
+
+// If you have a message type with no data, use void rather than undefined
+// This way you can call it with zero arguments
+export const [sendReady, readyStream, waitForReady] = getMessage<void>('READY')
 ```
 
 ```typescript
@@ -122,6 +124,10 @@ statsStream.subscribe(([{ hi, lo, date }, sender]) => {
   // Intellisense knows this is an Observable of
   // [Stats, chrome.runtime.MessageSender]
 })
+
+waitForReady().then(() => {
+  console.log('content.ts is ready')
+})
 ```
 
 ```typescript
@@ -130,8 +136,10 @@ import { sendStats } from './messages'
 
 sendStats({ hi: 30, low: 14, date: '11/12/2019' })
 
-// Throws a type error
+// Throws a TS error
 sendStats('not a Stats object')
+
+sendReady()
 ```
 
 ## Features <a name = "features"></a>
@@ -143,13 +151,13 @@ included, so no need to install an additional `@types` library!
 
 ### RxJs Observables
 
-Version 0.5.0 includes an
+Version 0.5.0 introduces an
 [RxJs Observable](https://rxjs-dev.firebaseapp.com/guide/overview) as
 [`messages.stream`](#api-messages-stream).
 
 ### Scopes
 
-Version 0.5.0 introduces [`useScope`](#api-use-scope), a way to use a separate
+Version 0.5.0 introduces [`getScope`](#api-use-scope), a way to use a separate
 messaging space.
 
 This is useful if you are writing a library for Chrome extensions that uses
@@ -157,18 +165,18 @@ messages internally, but you don't want to pollute the global messaging space.
 
 ## API <a name = "api"></a>
 
-### `useLine(greeting)`
+### `getMessage(greeting)`
 
 ```javascript
-import { useLine } from '@bumble/messages'
+import { getMessage } from '@bumble/messages'
 
-const [sendMessage, messageStream] = useLine('greeting')
+const [sendMessage, messageStream, waitForMessage] = getMessage('greeting')
 ```
 
-Use this function to create a message system to import into both the message
-sender and receiver context (ie, the background page and a content script).
-`useLine` is a TypeScript generic function. See the [Usage](#usage) section for
-more information, including TypeScript support!
+Use this function to create an isomorphic message system. Import it into both
+the message sender and receiver context (ie, the background page and a content
+script). `getMessage` is a TypeScript generic function. See the [Usage](#usage)
+section for more information, including TypeScript support!
 
 #### `greeting`
 
@@ -178,7 +186,7 @@ A unique string to identify the message.
 
 #### Returns: `[messageSender, messageStream]`
 
-> Type: `[function, Observable]`
+> Type: `[Function, Observable]`
 
 Import the messageSender into the context you wish to send a message. Call the
 sender with the data you want to send.
@@ -266,14 +274,14 @@ messages.on((message, sender) => {
 
 > I've found relying on async messages to be a bit of an anti-pattern. Chrome is
 > pretty aggressive about closing the response port, so unless you're doing
-> something synchronous, it's better to send a separate message and use a
+> something synchronous, it's better to use a separate message and use a
 > listener to handle responses.
 
 To receive async messages, use a message handler with 3 arguments. This handler
 will only receive messages sent with the async option.
 
-The third argument is a `sendResponse` function, which must be called relatively
-quickly, or Chrome will throw an error.
+The third argument is a `sendResponse` function, which must be called very
+quickly, or Chrome will throw an error. Even a single await may make the extension unreliable.
 
 ```javascript
 // Async functions are OK!
@@ -311,15 +319,15 @@ messages.stream.subscribe(([message, sender, sendResponse]) => {
 })
 ```
 
-### `useScope` <a name = "api-use-scope"></a>
+### `getScope` <a name = "api-use-scope"></a>
 
 This is useful if you are writing a library for Chrome extensions that uses
 messages internally, but you don't want to pollute the global messaging space.
 
 ```javascript
-import { messages, useScope } from '@bumble/messages'
+import { messages, getScope } from '@bumble/messages'
 
-const myScope = useScope('my-library')
+const myScope = getScope('my-library')
 
 // `messages.on` will not receive this message
 myScope.send({ greeting: 'hey' })
