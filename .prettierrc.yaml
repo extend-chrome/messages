@@ -5,3 +5,7 @@ semi: false
 singleQuote: true
 tabWidth: 2
 trailingComma: all
+pluginSearchDirs:
+  - ./node_modules
+plugins:
+  - ./node_modules/prettier-plugin-packagejson
