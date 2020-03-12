@@ -2,13 +2,15 @@
 
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
-import typescript from '@rollup/plugin-typescript'
+import sucrase from '@rollup/plugin-sucrase'
 import path from 'path'
 import { chromeExtension } from 'rollup-plugin-chrome-extension'
 
 const plugins = [
   chromeExtension({ verbose: false }),
-  typescript(),
+  sucrase({
+    transforms: ['typescript']
+  }),
   resolve(),
   commonjs(),
 ]
