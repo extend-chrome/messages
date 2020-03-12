@@ -13,8 +13,6 @@ const lastError = {
   },
 }
 
-chrome.runtime.lastError
-
 afterEach(jest.clearAllMocks)
 
 test('sends async CoreMessage to runtime', () => {
