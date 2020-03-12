@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "module": "es2015",
     "moduleResolution": "node",
@@ -10,9 +9,7 @@
     "strict": true,
     "target": "es2017",
     "lib": ["es2017", "dom", "esnext.array"],
-    "outDir": "lib"
   },
-  "include": ["src", "tests", "jest.config.js"],
-  "exclude": ["lib", "playground", "types", "tests/e2e/extension-src"],
+  "include": ["src"],
   "typeAcquisition": { "enable": true }
 }
