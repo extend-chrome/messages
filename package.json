@@ -20,13 +20,13 @@
   },
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.esm.js",
+  "types": "types/index.d.ts",
   "files": [
     "lib",
     "types"
   ],
-  "main": "lib/index.cjs.js",
-  "module": "lib/index.esm.js",
-  "types": "types/index.d.ts",
   "scripts": {
     "build": "run-p build:dev build:types",
     "build:dev": "rollup -c --environment NODE_ENV:development",
@@ -44,9 +44,10 @@
     "preversion": "run-s test:quick"
   },
   "dependencies": {
-    "@bumble/jest-chrome": "0.4.0"
+    "rxjs": "^6.5.4"
   },
   "devDependencies": {
+    "@bumble/jest-chrome": "^0.5.1",
     "@rollup/plugin-commonjs": "^11.0.2",
     "@rollup/plugin-node-resolve": "^7.1.1",
     "@rollup/plugin-typescript": "^3.0.0",
@@ -82,8 +83,5 @@
     "ts-jest": "^25.2.1",
     "tslib": "^1.11.1",
     "typescript": "^3.8.3"
-  },
-  "peerDependencies": {
-    "rxjs": "^6.5.4"
   }
 }
