@@ -1,22 +1,22 @@
 <!--
 Template tags:
-bumble-org
+extend-chrome
 messages
-@bumble
+@extend-chrome
 https://imgur.com/cKFLQ0o.png
 -->
 
 <p align="center">
-  <a href="https: //github.com/bumble-org/messages" rel="noopener">
-  <img width=200px height=200px src="https://imgur.com/cKFLQ0o.png" alt="@bumble/messages logo"></a>
+  <a href="https: //github.com/extend-chrome/messages" rel="noopener">
+  <img width=200px height=200px src="https://imgur.com/cKFLQ0o.png" alt="@extend-chrome/messages logo"></a>
 </p>
 
-<h3 align="center">@bumble/messages</h3>
+<h3 align="center">@extend-chrome/messages</h3>
 
 <div align="center">
 
-[![npm (scoped)](https://img.shields.io/npm/v/@bumble/messages.svg)](https://www.npmjs.com/package/@bumble/messages)
-[![GitHub last commit](https://img.shields.io/github/last-commit/bumble-org/messages.svg)](https://github.com/bumble-org/messages)
+[![npm (scoped)](https://img.shields.io/npm/v/@extend-chrome/messages.svg)](https://www.npmjs.com/package/@extend-chrome/messages)
+[![GitHub last commit](https://img.shields.io/github/last-commit/extend-chrome/messages.svg)](https://github.com/extend-chrome/messages)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 [![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
 
@@ -47,13 +47,13 @@ You will need to use a bundler like [Rollup](https://rollupjs.org/guide/en/),
 Parcel, or Webpack to include this library in the build of Chrome extension.
 
 See
-[`rollup-plugin-chrome-extension`](https://github.com/bumble-org/rollup-plugin-chrome-extension)
+[`rollup-plugin-chrome-extension`](https://github.com/extend-chrome/rollup-plugin-chrome-extension)
 for an easy way use Rollup to build your Chrome extension!
 
 ### Installation
 
 ```sh
-$ npm i @bumble/messages
+$ npm i @extend-chrome/messages
 ```
 
 ## Usage <a name = "usage"></a>
@@ -63,7 +63,7 @@ traditional messages object.
 
 ```javascript
 // messages.js, used in both the background and content script
-import { getMessage } from '@bumble/messages'
+import { getMessage } from '@extend-chrome/messages'
 
 // getMessage returns [Function, Observable, Function]
 export const [sendNumber, numberStream, waitForNumber] = getMessage(
@@ -101,7 +101,7 @@ Intellisense has you covered.
 
 ```typescript
 // messages.ts
-import { getMessage } from '@bumble/messages'
+import { getMessage } from '@extend-chrome/messages'
 
 interface Stats {
   hi: number
@@ -168,7 +168,7 @@ messages internally, but you don't want to pollute the global messaging space.
 ### `getMessage(greeting)`
 
 ```javascript
-import { getMessage } from '@bumble/messages'
+import { getMessage } from '@extend-chrome/messages'
 
 const [sendMessage, messageStream, waitForMessage] = getMessage('greeting')
 ```
@@ -207,7 +207,7 @@ that includes at least a `greeting` property.
 
 ```javascript
 // content-script.js
-import { messages } from '@bumble/messages'
+import { messages } from '@extend-chrome/messages'
 
 // Simple message with no data
 messages.send({ greeting: 'hello' }).then(() => {
@@ -236,7 +236,7 @@ listeners with the third `sendResponse` argument will receive async messages.
 
 ```javascript
 // content-script.js
-import { messages } from '@bumble/messages'
+import { messages } from '@extend-chrome/messages'
 
 messages
   .send(
@@ -260,7 +260,7 @@ The return value of the handler is unused.
 
 ```javascript
 // background.js
-import * as messages from '@bumble/messages'
+import * as messages from '@extend-chrome/messages'
 
 // Listener should have 2, 1, or 0 arguments
 messages.on((message, sender) => {
@@ -308,7 +308,7 @@ Call this with the message handler function you wish to stop using.
 An Observable of all messages in its scope.
 
 ```typescript
-import { messages } from '@bumble/messages'
+import { messages } from '@extend-chrome/messages'
 
 // Receives all messages in the default scope
 messages.stream.subscribe(([message, sender, sendResponse]) => {
@@ -325,7 +325,7 @@ This is useful if you are writing a library for Chrome extensions that uses
 messages internally, but you don't want to pollute the global messaging space.
 
 ```javascript
-import { messages, getScope } from '@bumble/messages'
+import { messages, getScope } from '@extend-chrome/messages'
 
 const myScope = getScope('my-library')
 
@@ -337,5 +337,5 @@ messages.send({ greeting: 'hello?' })
 ```
 
 > Note: The Chrome API Event `chrome.runtime.onMessage` will still receive all
-> messages, but projects using `@bumble/messages` will not receive messages from
+> messages, but projects using `@extend-chrome/messages` will not receive messages from
 > other scopes.

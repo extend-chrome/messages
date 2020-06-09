@@ -24,7 +24,7 @@ const coreMessage: CoreMessage = {
   payload: message,
   scope,
 }
-const sender = {} // Not used directly by @bumble/messages
+const sender = {} // Not used directly by @extend-chrome/messages
 const response = {
   greeting: 'goodbye',
 }

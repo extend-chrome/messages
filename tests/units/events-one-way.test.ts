@@ -18,7 +18,7 @@ const coreMessage: CoreMessage = {
   tabId: null,
 }
 
-const sender = {} // Not used directly by @bumble/messages
+const sender = {} // Not used directly by @extend-chrome/messages
 const sendResponse = jest.fn()
 
 afterEach(() => {
