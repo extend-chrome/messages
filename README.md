@@ -8,7 +8,7 @@ https://imgur.com/cKFLQ0o.png
 
 <p align="center">
   <a href="https: //github.com/extend-chrome/messages" rel="noopener">
-  <img width=200px height=200px src="https://imgur.com/cKFLQ0o.png" alt="@extend-chrome/messages logo"></a>
+  <img width=200px height=200px src="https://imgur.com/XYtiJBw.png" alt="@extend-chrome/messages logo"></a>
 </p>
 
 <h3 align="center">@extend-chrome/messages</h3>
