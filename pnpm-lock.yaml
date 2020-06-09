@@ -1,5 +1,4 @@
 dependencies:
-  '@rollup/plugin-sucrase': 3.0.0_rollup@2.0.5
   '@types/chrome': 0.0.99
   '@types/node': 13.9.0
   rxjs: 6.5.4
@@ -8,7 +7,6 @@ devDependencies:
   '@rollup/plugin-commonjs': 11.0.2_rollup@2.0.5
   '@rollup/plugin-node-resolve': 7.1.1_rollup@2.0.5
   '@rollup/plugin-typescript': 4.0.0_c8c7ee356b9d61d8b26c0206611aa20e
-  '@sucrase/jest-plugin': 2.0.0
   '@types/jest': 25.1.4
   '@types/jest-in-case': 1.0.1
   '@types/puppeteer': 2.0.1
@@ -751,18 +749,6 @@ packages:
       rollup: ^1.20.0
     resolution:
       integrity: sha512-14ddhD7TnemeHE97a4rLOhobfYvUVcaYuqTnL8Ti7Jxi9V9Jr5LY7Gko4HZ5k4h4vqQM0gBQt6tsp9xXW94WPA==
-  /@rollup/plugin-sucrase/3.0.0_rollup@2.0.5:
-    dependencies:
-      '@rollup/pluginutils': 3.0.8_rollup@2.0.5
-      rollup: 2.0.5
-      sucrase: 3.12.1
-    dev: false
-    engines:
-      node: '>=8.0.0'
-    peerDependencies:
-      rollup: ^1.20.0
-    resolution:
-      integrity: sha512-sUQkoAXdw+bnd/cNZHGy5yQKW6OYYU7QlYBGhReI95uZljxO8t1LlbqCO2viIMV/u9pcCjgi8N9PcApcrJCA8Q==
   /@rollup/plugin-typescript/4.0.0_c8c7ee356b9d61d8b26c0206611aa20e:
     dependencies:
       '@rollup/pluginutils': 3.0.8_rollup@2.0.5
@@ -783,6 +769,7 @@ packages:
     dependencies:
       estree-walker: 1.0.1
       rollup: 2.0.5
+    dev: true
     engines:
       node: '>= 8.0.0'
     peerDependencies:
@@ -795,12 +782,6 @@ packages:
     dev: true
     resolution:
       integrity: sha512-qbk9AP+cZUsKdW1GJsBpxPKFmCJ0T8swwzVje3qFd+AkQb74Q/tiuzrdfFg8AD2g5HH/XbE/I8Uc1KYHVYWfhg==
-  /@sucrase/jest-plugin/2.0.0:
-    dependencies:
-      sucrase: 3.12.1
-    dev: true
-    resolution:
-      integrity: sha512-UqmtOnj2OliwV1qKFCQsci41vPX665wGvf5YosRjL+l6jF69HrgB3T8gGnCcF4tAmRycYw8t59x+Dgz64szXWA==
   /@types/babel__core/7.1.3:
     dependencies:
       '@babel/parser': 7.8.4
@@ -1166,9 +1147,6 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-9VGjrMsG1vePxcSweQsN20KY/c4zN0h9fLjqAbwbPfahM3t+NL+M9HC8xeXG2I8pX5NoamTGNuomEUFI7fcUjA==
-  /any-promise/1.3.0:
-    resolution:
-      integrity: sha1-q8av7tzqUugJzcA3au0845Y10X8=
   /anymatch/2.0.0:
     dependencies:
       micromatch: 3.1.10
@@ -1632,11 +1610,6 @@ packages:
       node: '>= 0.8'
     resolution:
       integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==
-  /commander/4.1.1:
-    engines:
-      node: '>= 6'
-    resolution:
-      integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==
   /component-emitter/1.3.0:
     dev: true
     resolution:
@@ -2124,6 +2097,7 @@ packages:
     resolution:
       integrity: sha512-39nnKffWz8xN1BU/2c79n9nB9HDzo0niYUqx6xyqUnyoAnQyyWpOTdZEeiCch8BBu515t4wp9ZmgVfVhn9EBpw==
   /estree-walker/1.0.1:
+    dev: true
     resolution:
       integrity: sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==
   /esutils/2.0.3:
@@ -2443,6 +2417,7 @@ packages:
     resolution:
       integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=
   /fsevents/2.1.2:
+    dev: true
     engines:
       node: ^8.16.0 || ^10.6.0 || >=11.0.0
     optional: true
@@ -3649,6 +3624,7 @@ packages:
     resolution:
       integrity: sha1-OwmSTt+fCDwEkP3UwLxEIeBHZO4=
   /lines-and-columns/1.1.6:
+    dev: true
     resolution:
       integrity: sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
   /load-json-file/4.0.0:
@@ -3893,13 +3869,6 @@ packages:
     dev: true
     resolution:
       integrity: sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
-  /mz/2.7.0:
-    dependencies:
-      any-promise: 1.3.0
-      object-assign: 4.1.1
-      thenify-all: 1.6.0
-    resolution:
-      integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==
   /nan/2.14.0:
     dev: true
     resolution:
@@ -3942,6 +3911,7 @@ packages:
     resolution:
       integrity: sha1-h6kGXNs1XTGC2PlM4RGIuCXGijs=
   /node-modules-regexp/1.0.0:
+    dev: true
     engines:
       node: '>=0.10.0'
     resolution:
@@ -4033,11 +4003,6 @@ packages:
     dev: true
     resolution:
       integrity: sha512-fexhUFFPTGV8ybAtSIGbV6gOkSv8UtRbDBnAyLQw4QPKkgNlsH2ByPGtMUqdWkos6YCRmAqViwgZrJc/mRDzZQ==
-  /object-assign/4.1.1:
-    engines:
-      node: '>=0.10.0'
-    resolution:
-      integrity: sha1-IQmtx5ZYh8/AXLvUQsrIv7s2CGM=
   /object-copy/0.1.0:
     dependencies:
       copy-descriptor: 0.1.1
@@ -4301,6 +4266,7 @@ packages:
   /pirates/4.0.1:
     dependencies:
       node-modules-regexp: 1.0.0
+    dev: true
     engines:
       node: '>= 6'
     resolution:
@@ -4736,6 +4702,7 @@ packages:
     resolution:
       integrity: sha512-Eww+Po86+9QSIXYLcVjU/NMYf2D1d2cSmp+SmFjoLk+vqjyV+TZJG69ShW5snSMpBN/MM0TJwYTbrLZSIiibcQ==
   /rollup/2.0.5:
+    dev: true
     engines:
       node: '>=10.0.0'
     hasBin: true
@@ -5199,18 +5166,6 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-VTyMAUfdm047mwKl+u79WIdrZxtFtn+nBxHeb844XBQ9uMNTuTHdx2hc5RiAJYqwTj3wc/xe5HLSdJSkJ+WfZw==
-  /sucrase/3.12.1:
-    dependencies:
-      commander: 4.1.1
-      lines-and-columns: 1.1.6
-      mz: 2.7.0
-      pirates: 4.0.1
-      ts-interface-checker: 0.1.10
-    engines:
-      node: '>=8'
-    hasBin: true
-    resolution:
-      integrity: sha512-aYG1RVImoyczRm/puVkNjbWZFus2b/LJj58RWEF7oe4XcKu/a/rudq+R9OrO69juzVx6KnPGTvjWUbIGnXTeFA==
   /supports-color/5.5.0:
     dependencies:
       has-flag: 3.0.0
@@ -5274,18 +5229,6 @@ packages:
     dev: true
     resolution:
       integrity: sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
-  /thenify-all/1.6.0:
-    dependencies:
-      thenify: 3.3.0
-    engines:
-      node: '>=0.8'
-    resolution:
-      integrity: sha1-GhkY1ALY/D+Y+/I02wvMjMEOlyY=
-  /thenify/3.3.0:
-    dependencies:
-      any-promise: 1.3.0
-    resolution:
-      integrity: sha1-5p44obq+lpsBCCB5eLn2K4hgSDk=
   /throat/5.0.0:
     dev: true
     resolution:
@@ -5382,9 +5325,6 @@ packages:
     dev: true
     resolution:
       integrity: sha1-qLE/1r/SSJUZZ0zN5VujaTtwbQk=
-  /ts-interface-checker/0.1.10:
-    resolution:
-      integrity: sha512-UJYuKET7ez7ry0CnvfY6fPIUIZDw+UI3qvTUQeS2MyI4TgEeWAUBqy185LeaHcdJ9zG2dgFpPJU/AecXU0Afug==
   /ts-jest/25.2.1_jest@25.1.0:
     dependencies:
       bs-logger: 0.2.6
@@ -5804,9 +5744,7 @@ specifiers:
   '@bumble/jest-chrome': ^0.5.1
   '@rollup/plugin-commonjs': ^11.0.2
   '@rollup/plugin-node-resolve': ^7.1.1
-  '@rollup/plugin-sucrase': ^3.0.0
   '@rollup/plugin-typescript': ^4.0.0
-  '@sucrase/jest-plugin': ^2.0.0
   '@types/chrome': 0.0.99
   '@types/jest': ^25.1.4
   '@types/jest-in-case': ^1.0.1
