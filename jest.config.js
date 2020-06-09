@@ -6,12 +6,9 @@ module.exports = {
   globals: {
     'ts-jest': {
       packageJson: 'package.json',
-      tsConfig: 'tsconfig.test.json',
+      tsConfig: 'tsconfig.json',
     },
   },
   setupFilesAfterEnv: ['./tests/jest.setup.ts'],
-  transform: {
-    '.(js|jsx)': '@sucrase/jest-plugin',
-  },
   testPathIgnorePatterns: ['/node_modules/', '/playground/'],
 }

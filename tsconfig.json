@@ -10,6 +10,6 @@
     "target": "es2017",
     "lib": ["es2017", "dom", "esnext.array"],
   },
-  "include": ["src"],
+  "include": ["src", "tests"],
   "typeAcquisition": { "enable": true }
 }
