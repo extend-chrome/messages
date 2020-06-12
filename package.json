@@ -53,6 +53,7 @@
     "@bumble/jest-chrome": "^0.5.1",
     "@rollup/plugin-commonjs": "^11.0.2",
     "@rollup/plugin-node-resolve": "^7.1.1",
+    "@rollup/plugin-sucrase": "^3.0.2",
     "@rollup/plugin-typescript": "^4.0.0",
     "@types/jest": "^25.1.4",
     "@types/jest-in-case": "^1.0.1",
