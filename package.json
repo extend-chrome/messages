@@ -28,21 +28,22 @@
     "types"
   ],
   "scripts": {
-    "build": "run-s build:clean build:dev build:types",
+    "build": "run-s build:clean build:pro build:types build:copy",
     "build:dev": "rollup -c --environment NODE_ENV:development",
     "build:pro": "rollup -c --environment NODE_ENV:production",
     "build:testExtension": "rm -rf tests/e2e/extension-build && rollup -c tests/e2e/extension-src/rollup.config.js",
     "build:types": "tsc -p tsconfig.d.json",
     "build:watch": "npm run build:dev -- -w",
     "build:clean": "rm -rf lib types",
-    "prepublishOnly": "run-s build:pro build:types",
+    "build:copy": "copyfiles -u 1 src/*.d.ts types",
+    "prepublishOnly": "npm run build",
     "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
     "start": "run-p build:watch test:watch",
     "test": "run-s test:quick test:e2e",
     "test:e2e": "run-s build:testExtension && jest e2e",
     "test:quick": "jest --testPathIgnorePatterns=e2e",
     "test:watch": "jest --testPathIgnorePatterns=e2e --watch",
-    "preversion": "run-s test:quick"
+    "preversion": "npm run test:quick"
   },
   "dependencies": {
     "@types/chrome": "0.0.99",
@@ -61,6 +62,7 @@
     "@typescript-eslint/eslint-plugin": "^2.23.0",
     "@typescript-eslint/parser": "^2.23.0",
     "chrome-promise": "^3.0.5",
+    "copyfiles": "^2.3.0",
     "delay": "^4.3.0",
     "eslint": "^6.8.0",
     "eslint-plugin-jest": "^23.8.2",
