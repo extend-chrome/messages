@@ -11,39 +11,32 @@
     "typescript",
     "intellisense"
   ],
-  "bugs": {
-    "url": "https://github.com/extend-chrome/messages/issues"
-  },
-  "repository": {
-    "type": "github",
-    "url": "https://github.com/extend-chrome/messages.git"
-  },
+  "repository": "github:extend-chrome/messages",
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
-  "main": "lib/index.cjs.js",
-  "module": "lib/index.esm.js",
-  "types": "types/index.d.ts",
   "files": [
     "lib",
     "types"
   ],
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.esm.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "build": "run-s build:clean build:pro build:types build:copy",
+    "build:clean": "rm -rf lib types",
+    "build:copy": "copyfiles -u 1 src/*.d.ts types",
     "build:dev": "rollup -c --environment NODE_ENV:development",
     "build:pro": "rollup -c --environment NODE_ENV:production",
     "build:testExtension": "rm -rf tests/e2e/extension-build && rollup -c tests/e2e/extension-src/rollup.config.js",
     "build:types": "tsc -p tsconfig.d.json",
     "build:watch": "npm run build:dev -- -w",
-    "build:clean": "rm -rf lib types",
-    "build:copy": "copyfiles -u 1 src/*.d.ts types",
     "prepublishOnly": "npm run build",
     "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
     "start": "run-p build:watch test:watch",
     "test": "run-s test:quick test:e2e",
     "test:e2e": "run-s build:testExtension && jest e2e",
     "test:quick": "jest --testPathIgnorePatterns=e2e",
-    "test:watch": "jest --testPathIgnorePatterns=e2e --watch",
-    "preversion": "npm run test:quick"
+    "test:watch": "jest --testPathIgnorePatterns=e2e --watch"
   },
   "dependencies": {
     "@types/chrome": "0.0.99",
