@@ -2,7 +2,13 @@ import { fromEventPattern, merge, Observable } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import { scopeAsyncOn, scopeOff, scopeOn } from './events'
 import { scopeAsyncSend, scopeSend } from './send'
-import { AsyncMessageListener, AsyncSendOptions, MessageListener, Sender, SendOptions } from './types'
+import {
+  AsyncMessageListener,
+  AsyncSendOptions,
+  MessageListener,
+  Sender,
+  SendOptions,
+} from './types'
 import { setupWaitForFirst } from './waitForFirst'
 
 /**
@@ -21,20 +27,20 @@ export function getScope(scope: string) {
    * Send a message. Options are optional.
    *
    * @param [options.async] Set to true to receive a response.
-   * @param [options.target] Either a tab id or a target name. Use to send to a tab or a specific listener.
+   * @param [options.tabId] Use to send to a tab
+   * @param [options.frameId] Use to send to a specific frame in a tab
    */
   function send<T, R>(data: T, options: AsyncSendOptions): Promise<R>
   function send<T>(data: T, options: SendOptions): Promise<void>
   function send<T>(data: T): Promise<void>
   async function send<T, R>(data: T, options?: SendOptions & { async?: true }) {
-    const _options: any = options || {}
-    _options.target = _options.target || _options.tabId
-    const { async = false, target } = _options
+    const _options = options || {}
+    const { async = false, ...sendOptions } = _options
 
     if (async) {
-      return _asyncSend(data, target)
+      return _asyncSend(data, sendOptions)
     } else {
-      return _send(data, target)
+      return _send(data, sendOptions)
     }
   }
 

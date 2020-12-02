@@ -1,4 +1,3 @@
-
 /**
  * Private interface.
  *
@@ -53,6 +52,7 @@ export type Sender = chrome.runtime.MessageSender
 
 export type SendOptions = {
   tabId?: number
+  frameId?: number
 }
 
 export type AsyncSendOptions = SendOptions & {
