@@ -9,6 +9,7 @@
     "strict": true,
     "target": "es2017",
     "lib": ["es2017", "dom", "esnext.array"],
+    "skipLibCheck": true
   },
   "include": ["src", "tests"],
   "typeAcquisition": { "enable": true }

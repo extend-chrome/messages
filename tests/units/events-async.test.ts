@@ -1,4 +1,4 @@
-import { chrome } from '@bumble/jest-chrome'
+import { chrome } from 'jest-chrome'
 import delay from 'delay'
 import { _getListener, _listeners } from '../../src/ListenerMap'
 import { getScope } from '../../src/scope'
