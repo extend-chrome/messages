@@ -121,11 +121,18 @@ export function getScope(scope: string) {
       if (typeof _options.tabId === 'number') {
         tabId = _options.tabId
       }
+      let frameId: number | undefined
+      if (typeof _options.frameId === 'number') {
+        frameId = _options.frameId
+      }
 
       if (async) {
-        return send<WrappedMessage, R>({ greeting, data }, { async, tabId })
+        return send<WrappedMessage, R>(
+          { greeting, data },
+          { async, tabId, frameId },
+        )
       } else {
-        return send<WrappedMessage>({ greeting, data }, { tabId })
+        return send<WrappedMessage>({ greeting, data }, { tabId, frameId })
       }
     }
 

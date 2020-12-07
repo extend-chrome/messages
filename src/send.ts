@@ -1,3 +1,4 @@
+import { ChromeMessageError } from './ChromeMessageError'
 import { CoreMessage, CoreResponse, SendOptions } from './types'
 
 export const scopeSend = (scope: string) => (
@@ -21,7 +22,7 @@ export const scopeSend = (scope: string) => (
         if (lastError && lastError.includes(noResponse)) {
           resolve()
         } else {
-          reject({ message: lastError })
+          reject(new ChromeMessageError({ coreMessage }))
         }
       } else {
         if (response && !response.success) {
@@ -53,13 +54,15 @@ export const scopeAsyncSend = (scope: string) => (
       scope,
     }
 
-    const callback = (coreResponse: CoreResponse) => {
-      if (chrome.runtime.lastError) {
-        reject(chrome.runtime.lastError)
-      } else if (coreResponse.success === false) {
-        reject(new Error(coreResponse.payload.greeting))
+    const callback = (coreResponse: CoreResponse | null) => {
+      if (
+        chrome.runtime.lastError ||
+        coreResponse === null ||
+        !coreResponse.success
+      ) {
+        reject(new ChromeMessageError({ coreMessage, coreResponse }))
       } else {
-        resolve(coreResponse.payload)
+        resolve(coreResponse!.payload)
       }
     }
 

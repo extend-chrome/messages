@@ -1,4 +1,5 @@
 import { chrome } from 'jest-chrome'
+import { ChromeMessageError } from '../../src/ChromeMessageError'
 import { getScope } from '../../src/scope'
 import { CoreMessage, CoreResponse } from '../../src/types'
 
@@ -52,6 +53,30 @@ test('sends async CoreMessage to tab', () => {
   )
 })
 
+test('sends async CoreMessage to frame', () => {
+  const payload = { greeting: 'hello' }
+  const tabId = 1234
+  const frameId = 5678
+
+  const coreMessage: CoreMessage = {
+    async: true,
+    payload,
+    scope,
+    tabId,
+  }
+
+  messages.send(payload, { tabId, frameId, async: true })
+
+  expect(chrome.tabs.sendMessage).toBeCalledWith(
+    tabId,
+    coreMessage,
+    { frameId },
+    expect.any(Function),
+  )
+
+  expect(chrome.runtime.sendMessage).not.toBeCalled()
+})
+
 test('resolves with response', async () => {
   const message = { greeting: 'hello' }
 
@@ -73,7 +98,7 @@ test('resolves with response', async () => {
 })
 
 test('rejects if success === false', async () => {
-  expect.assertions(2)
+  expect.assertions(4)
 
   const message = { greeting: 'hello' }
   const response = {
@@ -93,13 +118,19 @@ test('rejects if success === false', async () => {
   try {
     await messages.send(message, { async: true })
   } catch (error) {
-    expect(error).toBeInstanceOf(Error)
+    expect(error).toBeInstanceOf(ChromeMessageError)
     expect(error.message).toBe(response.greeting)
+    expect(error.coreResponse).toBe(coreResponse)
+    expect(error.coreMessage).toMatchObject({
+      async: true,
+      payload: message,
+      scope,
+    })
   }
 })
 
 test('rejects if runtime.lastError', async () => {
-  expect.assertions(2)
+  expect.assertions(3)
 
   const message = { greeting: 'hello' }
   lastErrorMessage = 'should reject'
@@ -109,6 +140,7 @@ test('rejects if runtime.lastError', async () => {
     await messages.send(message, { async: true })
   } catch (error) {
     expect(lastErrorSpy).toBeCalled()
+    expect(error).toBeInstanceOf(ChromeMessageError)
     expect(error.message).toBe(lastErrorMessage)
   }
 })
