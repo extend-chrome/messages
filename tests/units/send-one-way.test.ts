@@ -1,4 +1,5 @@
-import { chrome } from '@bumble/jest-chrome'
+import { chrome } from 'jest-chrome'
+import { ChromeMessageError } from '../../src/ChromeMessageError'
 import { getScope } from '../../src/scope'
 import { CoreMessage } from '../../src/types'
 
@@ -42,13 +43,37 @@ test('calls runtime.sendMessage if no target', () => {
   expect(chrome.tabs.sendMessage).not.toBeCalled()
 })
 
-test('calls tabs.sendMessage if target is number', () => {
+test('calls tabs.sendMessage if tabId is given', () => {
   const message = { greeting: 'hello' }
   const tabId = 1234
 
   messages.send(message, { tabId })
 
   expect(chrome.tabs.sendMessage).toBeCalled()
+  expect(chrome.runtime.sendMessage).not.toBeCalled()
+})
+
+test('calls tabs.sendMessage with frameId if frameId is given', () => {
+  const payload = { greeting: 'hello' }
+  const tabId = 1234
+  const frameId = 5678
+
+  const coreMessage: CoreMessage = {
+    async: false,
+    tabId,
+    payload,
+    scope,
+  }
+
+  messages.send(payload, { tabId, frameId })
+
+  expect(chrome.tabs.sendMessage).toBeCalledWith(
+    tabId,
+    coreMessage,
+    { frameId },
+    expect.any(Function),
+  )
+
   expect(chrome.runtime.sendMessage).not.toBeCalled()
 })
 
@@ -70,19 +95,23 @@ test('creates one-way coreMessage', () => {
   )
 })
 
-// TODO: unskip once last error implemented
-test.skip('rejects if runtime.lastError', async () => {
-  expect.assertions(1)
+test('rejects if runtime.lastError', async () => {
+  expect.assertions(2)
 
   const message = { greeting: 'hello' }
-  const errorMessage = 'should not resolve'
-  // chrome.runtime.sendMessage.setLastError(errorMessage)
+  const lastError = { message: 'should not resolve' }
+  chrome.runtime.lastError = lastError
 
-  const result = messages.send(message)
+  chrome.runtime.sendMessage.mockImplementation(
+    (m: any, sendResponse?: (respond: any) => void) => {
+      sendResponse?.({})
+    },
+  )
 
   try {
-    await result
+    await messages.send(message)
   } catch (error) {
-    expect(error.message).toBe(errorMessage)
+    expect(error).toBeInstanceOf(ChromeMessageError)
+    expect(error.message).toBe(lastError.message)
   }
 })

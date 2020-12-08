@@ -1,4 +1,4 @@
-import { chrome } from '@bumble/jest-chrome'
+import { chrome } from 'jest-chrome'
 import { _listeners } from '../../src/ListenerMap'
 import { getScope } from '../../src/scope'
 import { CoreMessage } from '../../src/types'
