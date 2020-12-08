@@ -1,6 +1,6 @@
 {
   "name": "@extend-chrome/messages",
-  "version": "1.2.0-0",
+  "version": "1.2.0",
   "description": "An API for Chrome extension messages that makes sense.",
   "keywords": [
     "chrome",
