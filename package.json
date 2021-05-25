@@ -14,13 +14,13 @@
   "repository": "github:extend-chrome/messages",
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.esm.js",
+  "types": "types/index.d.ts",
   "files": [
     "lib",
     "types"
   ],
-  "main": "lib/index.cjs.js",
-  "module": "lib/index.esm.js",
-  "types": "types/index.d.ts",
   "scripts": {
     "build": "run-s build:clean build:pro build:types build:copy",
     "build:clean": "rm -rf lib types",
@@ -40,8 +40,7 @@
   },
   "dependencies": {
     "@types/chrome": "0.0.99",
-    "@types/node": "^13.9.0",
-    "rxjs": "^6.5.4"
+    "@types/node": "^13.9.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -69,9 +68,12 @@
     "rollup-plugin-chrome-extension": "^3.4.0",
     "rollup-plugin-empty-dir": "^1.0.4",
     "rollup-plugin-zip": "^1.0.0",
-    "rxjs": "^6.5.4",
-    "ts-jest": "^25.2.1",
-    "tslib": "^1.11.1",
-    "typescript": "^3.8.3"
+    "rxjs": "^7.1.0",
+    "ts-jest": "^26.5.6",
+    "tslib": "^2.2.0",
+    "typescript": "^4.2.4"
+  },
+  "peerDependencies": {
+    "rxjs": "^6.5.4 || ^7.1.0"
   }
 }
