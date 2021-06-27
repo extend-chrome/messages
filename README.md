@@ -260,7 +260,7 @@ The return value of the handler is unused.
 
 ```javascript
 // background.js
-import * as messages from '@extend-chrome/messages'
+import { messages } from '@extend-chrome/messages'
 
 // Listener should have 2, 1, or 0 arguments
 messages.on((message, sender) => {
