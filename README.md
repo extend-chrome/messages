@@ -120,7 +120,7 @@ export const [sendReady, readyStream, waitForReady] = getMessage<void>('READY')
 // background.ts
 import { statsStream } from './messages'
 
-statsStream.subscribe(([{ hi, lo, date }, sender]) => {
+statsStream.subscribe(([{ hi, low, date }, sender]) => {
   // Intellisense knows this is an Observable of
   // [Stats, chrome.runtime.MessageSender]
 })
